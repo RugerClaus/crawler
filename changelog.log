@@ -1,0 +1,16 @@
+Alpha 0.1.0 ---- LOG
+
+Yet another attempt at making a game. This time I have removed everything but the player. I now have a top down world using the same character from that youtube tutorial that I
+seem to not be able to find. Oh well. I liked the assets. I have ditched them all. Now for the first version of this game.
+
+So far you can collect coins. The player now has multidirectional animations. The coins all have an assigned value with gold ones being the highest. I have started integrating 
+walls as well. That's huge. The boundaries work pretty well at the moment. I think this will be a maze/puzzle dungeon crawler. I want to have keys to get to further levels. 
+There should be some sort of portal and I already have a door graphic to test with lol. It's trash.
+
+You can also move diagonally which is neat. 
+
+This now has lots of pieces from previous setups (see the other two public repos on this profile), but I have now done a different style of level generation. Using a fixed grid.
+
+I will try to expand on this because I have given up on chunking for now. Maybe that will be something I learn later. For now fixed levels are handled in /assets/levels/level1.json
+I'll need to make this interchangeable with different levels. So I will probably add that in the next version. I know this is a huge amount of code for a first commit, but
+everything works, and is pretty extendable.
