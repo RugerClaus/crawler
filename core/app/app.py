@@ -4,7 +4,7 @@ from core.app.enitites.player import Player
 from core.app.world.world import World
 from core.app.world.camera import Camera
 from core.state.playerstate import PLAYERSTATE
-from sound.sound import SoundManager
+from core.sound.sound import SoundManager
 from core.app.pause import PauseMenu
 from core.state.manager import StateManager
 from core.state.appstate import APPSTATE
@@ -21,9 +21,9 @@ class Window():
         self.screen = pygame.display.set_mode((self.width,self.height))
         self.clock = pygame.time.Clock()
         self.state = StateManager()
-        self.world = World(self.screen, 100,100, 32)
+        self.world = World(self.screen, 100,100, 32,1)
         self.world.generate_base_terrain()
-        self.world.load_from_json("assets/levels/level1.json")
+        self.world.load_from_json()
         self.player = Player(self.screen, self.world)
         self.camera = Camera(self.width, self.height)  # Add this
         self.sound = SoundManager()
@@ -127,7 +127,7 @@ class Window():
             entity.update_animation()
 
     def handle_collisions(self):
-        self.player.check_for_coins()
+        self.player.check_for_coins(self.sound.play_sfx)
 
     def cleanup_entities(self):
         # Placeholder for when you want to remove dead or collected entities.

@@ -1,4 +1,7 @@
 {
+    "terrain": [
+        {"x": 0, "y": 0, "type": "dirt"}
+    ],
     "coins": [
         {"x": 10, "y": 10, "type": "bronze"},
         {"x": 15, "y": 10, "type": "silver"},

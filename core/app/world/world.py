@@ -1,20 +1,23 @@
-import pygame
+
 import json
+import pygame
+from core.app.world.tiles import Tile
 from core.app.enitites.animate import Animation
 from core.app.enitites.coin import Coin
 
 class World:
-    def __init__(self, screen, grid_width, grid_height, tile_size):
+    def __init__(self, screen, grid_width, grid_height, tile_size, starting_level):
         self.screen = screen
         self.grid_width = grid_width
         self.grid_height = grid_height
         self.tile_size = tile_size
-
-        self.tiles = {}  # static map: {(x, y): {"ground": obj, "object": obj}}
-        self.entities = []  # dynamic objects: [Coin(), Player(), Enemy()]
+        self.level = starting_level
+        self.tiles = {}  # Static map: {(x, y): {"ground": obj, "object": obj}}
+        self.entities = []  # Dynamic objects: [Coin(), Player(), Enemy()]
         self.gold_coin_animation = None
 
-        self.load_assets()  # <-- new method
+        self.load_assets()  # <-- New method
+        self.load_terrain_tiles()
 
     def load_assets(self):
         self.coin_animations = {
@@ -34,6 +37,16 @@ class World:
             ], frame_delay=50),
         }
 
+    def load_terrain_tiles(self):
+        """Define different terrain tiles."""
+        self.terrain_tiles = {
+            "dirt": Tile("assets/graphics/game/ground/shittydirt.png"),
+            "grass": Tile("assets/graphics/game/ground/grass.png"),
+            "missing_texture": Tile("assets/graphics/game/undefined.png")
+            # "water": Tile("assets/graphics/game/ground/water.png", is_walkable=False),
+            # "stone": Tile("assets/graphics/game/ground/stone.png"),
+        }
+
     def place_static(self, x, y, obj, layer):
         if layer not in ["ground", "object"]:
             raise ValueError("Only 'ground' or 'object' allowed in static tiles!")
@@ -44,22 +57,38 @@ class World:
             self.tiles[(x, y)][layer] = obj
 
     def generate_base_terrain(self):
-        dirt_image = pygame.image.load("assets/graphics/game/ground/shittydirt.png").convert_alpha()
-
+        # Simple fallback terrain if JSON level isn't found
         for y in range(self.grid_height):
             for x in range(self.grid_width):
-                dirt = pygame.sprite.Sprite()
-                dirt.image = dirt_image
-                dirt.rect = dirt_image.get_rect()
-                self.place_static(x, y, dirt, layer="ground")
+                tile_type = "missing_texture"
+                tile = self.terrain_tiles.get(tile_type, self.terrain_tiles["missing_texture"])
 
-    def load_from_json(self, filename):
+                ground_sprite = pygame.sprite.Sprite()
+                ground_sprite.image = tile.image
+                ground_sprite.rect = ground_sprite.image.get_rect()
+
+                self.place_static(x, y, ground_sprite, layer="ground")
+
+    def load_from_json(self):
+        filename = f"assets/levels/level{self.level}.json"
         wall_image = pygame.image.load("assets/graphics/game/walls/shittywall.png").convert_alpha()
 
         with open(filename, "r") as f:
             data = json.load(f)
 
-        # Place walls
+        # --- Place terrain from JSON ---
+        for tile_data in data.get("terrain", []):
+            x, y = tile_data["x"], tile_data["y"]
+            tile_type = tile_data.get("type", "grass")  # Default to grass
+            tile = self.terrain_tiles.get(tile_type, self.terrain_tiles["grass"])
+
+            ground_sprite = pygame.sprite.Sprite()
+            ground_sprite.image = tile.image
+            ground_sprite.rect = tile.image.get_rect()
+
+            self.place_static(x, y, ground_sprite, layer="ground")
+
+        # --- Place walls ---
         for wall_data in data.get("walls", []):
             x, y = wall_data["x"], wall_data["y"]
             wall = pygame.sprite.Sprite()
@@ -67,13 +96,14 @@ class World:
             wall.rect = wall_image.get_rect()
             self.place_static(x, y, wall, layer="object")
 
+        # --- Place coins ---
         for coin_data in data.get("coins", []):
             x, y = coin_data["x"], coin_data["y"]
-            coin_type = coin_data.get("type", "gold")  # default to gold
+            coin_type = coin_data.get("type", "gold")
             animation = self.coin_animations.get(coin_type)
 
             if animation:
-                coin = Coin(self.screen, x, y, self.tile_size, animation,coin_type)
+                coin = Coin(self.screen, x, y, self.tile_size, animation, coin_type)
                 self.entities.append(coin)
             else:
                 print(f"Warning: Unknown coin type '{coin_type}' at ({x},{y})")
@@ -103,4 +133,7 @@ class World:
 
         # Draw dynamic entities
         for entity in self.entities:
-            entity.draw(camera)  # <-- pass camera object
+            entity.draw(camera)
+
+    def increase_level(self):
+        self.level += 1

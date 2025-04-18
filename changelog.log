@@ -14,3 +14,13 @@ This now has lots of pieces from previous setups (see the other two public repos
 I will try to expand on this because I have given up on chunking for now. Maybe that will be something I learn later. For now fixed levels are handled in /assets/levels/level1.json
 I'll need to make this interchangeable with different levels. So I will probably add that in the next version. I know this is a huge amount of code for a first commit, but
 everything works, and is pretty extendable.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.1 ---- LOG
+
+Making much better progress with this game so far than I'd hoped. I've really gotten the level design started. There is now an undefined texture for every terrain feature not 
+set in the level file. The coins now make specific noises when picked up. I'm eventually going to have to overhaul this for all items not just coins. Perhaps there will be
+higher value coins/currency that can be picked up later on. Haven't considered that fully. You can design the level in the level JSON file and then make sure you have textures
+added to the appropriate directories before running load_terrain_tiles on the World object. Besides that, everything can be loaded from there. This game is looking a bit spaghetti
+code-y, but I don't really care. If I have to come back to it, I suppose I will. Now that state management is handled, my life is a lot easier.

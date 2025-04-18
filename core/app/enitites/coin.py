@@ -3,9 +3,9 @@ from core.app.enitites.animate import Animation
 from core.app.enitites.entity import Entity
 
 class Coin(Entity):
-    def __init__(self, screen, grid_x, grid_y, tile_size, animation, coin_type="gold"):
+    def __init__(self, screen, grid_x, grid_y, tile_size, animation, coin_type):
         super().__init__(screen, solid=False, health=1)
-
+        self.coin_type = coin_type
         self.grid_x = grid_x
         self.grid_y = grid_y
         self.tile_size = tile_size

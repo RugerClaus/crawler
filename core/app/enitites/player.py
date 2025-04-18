@@ -107,10 +107,17 @@ class Player(Entity):
             self.speed_y = -3
         else:
             self.state = PLAYERSTATE.IDLE
-    def check_for_coins(self):
+    def check_for_coins(self,sound=None):
         for entity in self.world.entities:
             if isinstance(entity, Coin) and self.rect.colliderect(entity.rect):
                 self.pick_up_coin(entity)
+                if sound is not None:
+                    if entity.coin_type == "gold": 
+                        sound("gold_coin")
+                    if entity.coin_type == "silver":
+                        sound("silver_coin")
+                    if entity.coin_type == "bronze":
+                        sound("bronze_coin")
 
     def pick_up_coin(self, coin):
         # Increase score or add coin to inventory

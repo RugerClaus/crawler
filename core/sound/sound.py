@@ -13,7 +13,10 @@ class SoundManager:
             "plasma_rifle": 'assets/audio/weird_space_gun.wav',
             "non_mechanical_item" : 'assets/audio/non_mechanical_weapon_pickup.wav',
             "mechanical_item": "assets/audio/mechanical_weapon_pickup.wav",
-            "magnum": "assets/audio/gunshot.mp3"
+            "magnum": "assets/audio/gunshot.mp3",
+            "gold_coin": "assets/audio/coinsound1.wav",
+            "silver_coin": "assets/audio/coinsound2.wav",
+            "bronze_coin": "assets/audio/coinsound3.wav"
         }
         self.volume = volume
         self.music_active = True
