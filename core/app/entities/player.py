@@ -5,13 +5,13 @@ from core.state.playerstate import PLAYERSTATE
 from core.app.entities.coin import Coin
 
 class Player(Entity):
-    def __init__(self, screen, world):
+    def __init__(self, screen, world,x=1984,y=1984):
         super().__init__(screen, False, 0)
         self.world = world
         self.images = self.load_player_images()
         self.image = self.images["IDLE"][0]
         self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = 1984, 1984
+        self.rect.x, self.rect.y = x, y
         self.world_x = self.rect.x
         self.world_y = self.rect.y
         self.speed_x = 0

@@ -1,6 +1,6 @@
 import pygame
 from core.app.world.tiles import Tile
-from core.app.world.level_structure import *
+from core.app.world.level_structures.level_1_structure import *
 
 class World:
     def __init__(self, screen, grid_width, grid_height, tile_size, starting_level):

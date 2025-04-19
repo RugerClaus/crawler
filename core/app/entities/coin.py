@@ -35,3 +35,13 @@ class Coin(Entity):
 
     def draw(self, camera):
         super().draw(camera)  # no need to repeat logic!
+
+    def to_dict(self):
+        data = super().to_dict()
+        data.update({
+            "grid_x": self.grid_x,
+            "grid_y": self.grid_y,
+            "coin_type": self.coin_type,
+            "value": self.value
+        })
+        return data

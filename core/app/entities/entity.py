@@ -30,3 +30,10 @@ class Entity(pygame.sprite.Sprite):
         if self.image and self.rect:
             render_rect = camera.apply(self.rect)
             self.screen.blit(self.image, render_rect)
+            
+    def to_dict(self):
+        return {
+            "type": self.__class__.__name__,  # this saves the class name like "Spike"
+            "x": self.rect.x,
+            "y": self.rect.y,
+        }

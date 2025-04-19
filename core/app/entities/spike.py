@@ -2,13 +2,13 @@ import pygame
 from core.app.entities.entity import Entity
 
 class Spike(Entity):
-    def __init__(self, screen, grid_x, grid_y, tile_size, damage_amount=10):
+    def __init__(self, screen, grid_x, grid_y, tile_size, damage=10):
         super().__init__(screen, solid=False, health=1)
         self.grid_x = grid_x
         self.grid_y = grid_y
         self.tile_size = tile_size
         self.image = pygame.image.load("assets/graphics/game/ground/spike.png")
-        self.damage_amount = damage_amount
+        self.damage = damage
 
         self.rect = pygame.Rect(
             grid_x * tile_size,
@@ -20,7 +20,7 @@ class Spike(Entity):
         # Simple damage with cooldown prevention, assuming player has this logic.
         now = pygame.time.get_ticks()
         if not hasattr(player, 'last_damage_time') or now - player.last_damage_time > 1000:  # 1 sec i-frame
-            player.current_health -= self.damage_amount
+            player.current_health -= self.damage
             player.last_damage_time = now
             print("Ouch!")
             if sound is not None:
@@ -28,3 +28,12 @@ class Spike(Entity):
 
     def draw(self, camera):
         super().draw(camera)
+
+    def to_dict(self):
+        data = super().to_dict()
+        data.update({
+            "grid_x": self.grid_x,
+            "grid_y": self.grid_y,
+            "damage": self.damage
+        })
+        return data

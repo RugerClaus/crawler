@@ -1,7 +1,8 @@
 import pygame
 
 class Tile:
-    def __init__(self, image_path, is_walkable=True,deals_damage=False,damage_amount=10):
+    def __init__(self, image_path, is_walkable=True, deals_damage=False, damage_amount=10):
+        self.image_path = image_path  # Store the image path
         self.image = pygame.image.load(image_path).convert_alpha()
         self.damage_amount = damage_amount
         self.rect = self.image.get_rect()

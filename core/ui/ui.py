@@ -2,7 +2,7 @@ import pygame
 import math
 from core.app.font import FontEngine
 
-class UI:
+class PlayerUI:
 
     def __init__(self, app):
         self.surface = pygame.surface.Surface((100, 400), pygame.SRCALPHA)

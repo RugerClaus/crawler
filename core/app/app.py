@@ -12,8 +12,9 @@ from core.state.gamestate import GAMESTATE
 from core.app.mainmenu import MainMenu
 from core.util.debugger import Debugger
 from core.app.font import FontEngine
-from core.ui.ui import UI
+from core.ui.ui import PlayerUI as UI
 from core.ui.gameover import GameOverMenu
+from core.util.savemanager import SaveManager
 
 class Window():
     def __init__(self,version):
@@ -39,6 +40,7 @@ class Window():
             self.toggle_music,
             self.toggle_sfx,
             self.go_to_menu,
+            self.save_game,
             pygame.quit
         )
         self.game_over_menu = GameOverMenu(self,self.reset_game,self.go_to_menu,pygame.quit)
@@ -46,18 +48,64 @@ class Window():
         self.main_menu = MainMenu(
         self,
         self.start_game,
+        self.load_game,
         pygame.quit
         )
         self.ui = UI(self)
         self.debug = Debugger(self)
         self.debug_enabled = False
         pygame.display.set_caption(self.title)
+        self.save_manager = SaveManager()
 
     def start_game(self):
         self.sound.stop_music()
         self.state.set_app_state(APPSTATE.GAME_ACTIVE)
         self.sound.play_music("game")
     
+    def save_game(self):
+        self.save_manager.save(self.player,self.world)
+    
+    def load_game(self):
+        self.state.set_app_state(APPSTATE.GAME_ACTIVE)
+        self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING)
+
+        # Load the save file to get player and world data
+        print("Loading save data...")
+        self.save_manager.load(self.player, self.world)
+        
+        print(f"Loaded save data: {self.save_manager.loaded_data}")
+
+        # Create the world based on the saved level
+        self.world = World(self.screen, 124, 124, 32, 1)
+        
+        # Get the level from the loaded data
+        saved_level = self.save_manager.loaded_data["level"]
+        print(f"Loaded level: {saved_level}")
+        
+        self.world.level = saved_level
+        self.world.generate_map()
+
+        # Create the player object with the required arguments, passing loaded coordinates
+        print("Creating player object...")
+        player_data = self.save_manager.loaded_data["player"]
+        self.player = Player(self.screen, self.world, player_data["x"], player_data["y"])  # Pass loaded position
+        
+        # Set the player's health from the save data
+        print(f"Setting player position and health: {player_data}")
+        self.player.current_health = player_data["health"]
+
+        # Sync UI and camera with the new player and world
+        print("Syncing UI and camera with player and world...")
+        self.ui.player = self.player
+        self.camera = Camera(self.width, self.height)
+
+        # Stop menu music and start game music
+        print("Changing music...")
+        self.sound.stop_music()
+        self.sound.play_music("game")
+
+
+
     def reset_game(self):
         self.world = World(self.screen, 124, 124, 32, 1)  # Create a new world instance
         self.world.generate_map()
