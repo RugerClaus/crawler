@@ -24,3 +24,24 @@ set in the level file. The coins now make specific noises when picked up. I'm ev
 higher value coins/currency that can be picked up later on. Haven't considered that fully. You can design the level in the level JSON file and then make sure you have textures
 added to the appropriate directories before running load_terrain_tiles on the World object. Besides that, everything can be loaded from there. This game is looking a bit spaghetti
 code-y, but I don't really care. If I have to come back to it, I suppose I will. Now that state management is handled, my life is a lot easier.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.2 ---- LOG
+
+Game now has foreground position tiles, which are currently just black squares, but they can be set to building tiles or whatever. All the logic is there. Implemented a debugger.
+It can be accessed by pressing F9, and shows the version, the player's coordinates in tiles, and the current FPS of the game. You can now close the pause menu with the escape key.
+All hail callbacks. Callback functions are really your best friend. Cross-object functionality. The true messaging function of objects. Don't let the abstraction that is an object
+get in the way of your program. 
+
+Anyway, the biggest functionality change here is my simulated third dimension. I'm kind of feeling a hammerwatch sort of vibe for this one. Eventually there will be actual terrain
+but for now enjoy my placeholder undefined block. Feel lucky, it was initially a circle with a cross on a white background. Trust me the magenta looks loads better. 
+
+After writing all that, I went ahead and overhauled the world generation at least partially. level_structure.py will take care of loading structures and their details onto
+the grid. However, the level itself may need to be an object. That or I have other files or call alternate functions depending on the level. I could add a conditional into 
+World.generate_base_terrain() to check for level and render what's needed there procedurally. That' what I think I'll do. Regardless, the player now starts in a structure of sorts
+so that is cool. 
+
+The real work in all of this update was reworking the player sprites to include a sword. That took me so long to do. I'm not using spritesheets, I'm loading individual images.
+Apparently I haven't learnt my lesson yet, nor do I know how to use a spritesheet. I'm certain I'll need to learn that eventually. Extremely certain. In fact it may be a huge
+technical hurdle in this game, but I haven't seen a problem yet.

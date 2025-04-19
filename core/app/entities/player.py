@@ -1,8 +1,8 @@
 import pygame
-from core.app.enitites.entity import Entity
-from core.app.enitites.animate import Animation
+from core.app.entities.entity import Entity
+from core.app.entities.animate import Animation
 from core.state.playerstate import PLAYERSTATE
-from core.app.enitites.coin import Coin
+from core.app.entities.coin import Coin
 
 class Player(Entity):
     def __init__(self, screen, world):
@@ -11,7 +11,7 @@ class Player(Entity):
         self.images = self.load_player_images()
         self.image = self.images["IDLE"][0]
         self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = 400, 400
+        self.rect.x, self.rect.y = 1984, 1984
         self.world_x = self.rect.x
         self.world_y = self.rect.y
         self.speed_x = 0
@@ -55,23 +55,31 @@ class Player(Entity):
         half_w = self.rect.width // 2
         half_h = self.rect.height // 2
 
-        tiles_to_check = [
-            ((future_x - half_w) // self.world.tile_size, (future_y - half_h) // self.world.tile_size),
-            ((future_x + half_w - 1) // self.world.tile_size, (future_y - half_h) // self.world.tile_size),
-            ((future_x - half_w) // self.world.tile_size, (future_y + half_h - 1) // self.world.tile_size),
-            ((future_x + half_w - 1) // self.world.tile_size, (future_y + half_h - 1) // self.world.tile_size),
+        # First: check horizontal movement
+        horizontal_tiles = [
+            ((future_x - half_w) // self.world.tile_size, self.world_y // self.world.tile_size),
+            ((future_x + half_w - 1) // self.world.tile_size, self.world_y // self.world.tile_size),
+            ((future_x - half_w) // self.world.tile_size, (self.world_y + half_h - 1) // self.world.tile_size),
+            ((future_x + half_w - 1) // self.world.tile_size, (self.world_y + half_h - 1) // self.world.tile_size),
         ]
 
-        can_move_x = all(not self.world.is_blocked(tx, ty) for tx, ty in tiles_to_check)
-        can_move_y = all(not self.world.is_blocked(tx, ty) for tx, ty in tiles_to_check)
-
-        if can_move_x:
+        if all(not self.world.is_blocked(tx, ty) for tx, ty in horizontal_tiles):
             self.world_x = future_x
-        if can_move_y:
+
+        # Then: check vertical movement
+        vertical_tiles = [
+            (self.world_x // self.world.tile_size, (future_y - half_h) // self.world.tile_size),
+            (self.world_x // self.world.tile_size, (future_y + half_h - 1) // self.world.tile_size),
+            ((self.world_x + half_w - 1) // self.world.tile_size, (future_y - half_h) // self.world.tile_size),
+            ((self.world_x + half_w - 1) // self.world.tile_size, (future_y + half_h - 1) // self.world.tile_size),
+        ]
+
+        if all(not self.world.is_blocked(tx, ty) for tx, ty in vertical_tiles):
             self.world_y = future_y
 
         self.rect.centerx = self.world_x
         self.rect.centery = self.world_y
+        self.coords = (self.world_x, self.world_y)
 
         self.select_animation()
         self.update_animation()
@@ -122,7 +130,7 @@ class Player(Entity):
     def pick_up_coin(self, coin):
         # Increase score or add coin to inventory
         self.money += coin.value  # Add to score (or modify inventory if needed)
-        print(f"Coin picked up! Current score: {self.money}")
+        print(f"Coin picked up! Current money: {self.money}")
         
         # Remove the coin from the world
         self.world.entities.remove(coin)  # <-- removes the coin from the world

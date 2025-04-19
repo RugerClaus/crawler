@@ -39,5 +39,8 @@ class PauseMenu:
             mouse_pos = pygame.mouse.get_pos()
             for button in self.buttons:
                 button.is_clicked(mouse_pos, True)  # True = left click
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                self.resume_callback()
         if event.type == pygame.QUIT:
             pygame.quit()

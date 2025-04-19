@@ -1,6 +1,6 @@
 import sys
 import pygame
-from core.app.enitites.player import Player
+from core.app.entities.player import Player
 from core.app.world.world import World
 from core.app.world.camera import Camera
 from core.state.playerstate import PLAYERSTATE
@@ -10,18 +10,23 @@ from core.state.manager import StateManager
 from core.state.appstate import APPSTATE
 from core.state.gamestate import GAMESTATE
 from core.app.mainmenu import MainMenu
+from core.util.debugger import Debugger
+from core.app.font import FontEngine
+from core.ui.ui import UI
 
 class Window():
     def __init__(self,version):
         self.width = 800
         self.height = 800
-        self.title = f"Crawler - Version: {version}"
+        self.version = version
+        self.title = f"Crawler - Version: {self.version}"
         self.fps = 60
         pygame.init()
+        self.font = FontEngine("default").font
         self.screen = pygame.display.set_mode((self.width,self.height))
         self.clock = pygame.time.Clock()
         self.state = StateManager()
-        self.world = World(self.screen, 100,100, 32,1)
+        self.world = World(self.screen, 124,124, 32,1)
         self.world.generate_base_terrain()
         self.world.load_from_json()
         self.player = Player(self.screen, self.world)
@@ -41,6 +46,9 @@ class Window():
         self.start_game,
         pygame.quit
         )
+        self.ui = UI(self)
+        self.debug = Debugger(self)
+        self.debug_enabled = False
         pygame.display.set_caption(self.title)
 
     def start_game(self):
@@ -51,6 +59,7 @@ class Window():
     def go_to_menu(self):
         self.sound.stop_music()
         self.sound.play_music("menu")
+        self.pause_state = False
         self.state.set_app_state(APPSTATE.MAIN_MENU)
         
 
@@ -97,6 +106,9 @@ class Window():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_F9:
+                    self.toggle_debug()
 
             if self.state.is_app_state(APPSTATE.MAIN_MENU):
                 self.main_menu.handle_event(event)
@@ -125,7 +137,6 @@ class Window():
         self.player.update()
         for entity in self.world.entities:
             entity.update_animation()
-
     def handle_collisions(self):
         self.player.check_for_coins(self.sound.play_sfx)
 
@@ -133,8 +144,15 @@ class Window():
         # Placeholder for when you want to remove dead or collected entities.
         pass
 
+    def toggle_debug(self):
+        self.debug_enabled = not self.debug_enabled
+
     def draw_everything(self):
         self.camera.update(self.player)
-        self.screen.fill((255, 255, 255))
+        self.screen.fill((0, 0, 0))
         self.world.draw(self.camera)
         self.player.draw(self.camera)
+        self.world.draw_foreground(self.camera)
+        self.ui.draw(self.screen)
+        if self.debug_enabled == True:
+            self.debug.draw(self.screen)

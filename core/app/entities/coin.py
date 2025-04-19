@@ -1,6 +1,5 @@
 import pygame
-from core.app.enitites.animate import Animation
-from core.app.enitites.entity import Entity
+from core.app.entities.entity import Entity
 
 class Coin(Entity):
     def __init__(self, screen, grid_x, grid_y, tile_size, animation, coin_type):
