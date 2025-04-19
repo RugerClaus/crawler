@@ -20,6 +20,9 @@ class Player(Entity):
         self.intent = PLAYERSTATE.IDLE
         self.set_animations()
         self.money = 0
+        self.current_health = 150
+        self.max_health = 150
+        self.game_over_state = False
 
     def load_player_images(self):
         return {
@@ -40,6 +43,7 @@ class Player(Entity):
                 pygame.image.load("assets/graphics/game/player/player_walk_down_1.png").convert_alpha(),
                 pygame.image.load("assets/graphics/game/player/player_walk_down_2.png").convert_alpha()
             ],
+            "DEAD": [pygame.image.load("assets/graphics/game/player/player_dead.png")]
         }
 
     def set_animations(self):
@@ -80,6 +84,10 @@ class Player(Entity):
         self.rect.centerx = self.world_x
         self.rect.centery = self.world_y
         self.coords = (self.world_x, self.world_y)
+
+        if self.current_health <= 0:
+            self.health = 0
+            self.game_over_state = True
 
         self.select_animation()
         self.update_animation()
@@ -134,3 +142,8 @@ class Player(Entity):
         
         # Remove the coin from the world
         self.world.entities.remove(coin)  # <-- removes the coin from the world
+
+    def check_for_damage_sources(self, entities,sound=None):
+        for entity in entities:
+            if self.rect.colliderect(entity.rect):
+                entity.hurt_player(self,sound)

@@ -45,3 +45,19 @@ so that is cool.
 The real work in all of this update was reworking the player sprites to include a sword. That took me so long to do. I'm not using spritesheets, I'm loading individual images.
 Apparently I haven't learnt my lesson yet, nor do I know how to use a spritesheet. I'm certain I'll need to learn that eventually. Extremely certain. In fact it may be a huge
 technical hurdle in this game, but I haven't seen a problem yet.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.3 ---- LOG
+
+Now the level structure is completely handled. In fact, the coin rendering is way better as with any entity now. All the entities are stored in the world object rather than the
+Window object for separation of concerns and that precaution has benefitted me. There is now a way to place coins and damaging tiles down. The only damaging tile currently is
+"spike". This works as intended. 
+
+I cleaned up a lot of the World class code. I put most of the world loading on the level_structure file now, so there's no messy JSON. That was a poor idea. Tedious as fuck.
+
+You'll also notice a huge change on the left side of the screen. There is now a health bar, and a game over function. The player can take damage and teh game over screen can be 
+activated. It needs some adjustment, but for testing purposes, the Game over screen is fine. I'm really proud of how far this has come. There are now obstacle tiles, the player 
+take damage, and collect currency. Now all it needs is an enemy and a store, and it will be a full fledged game. Maybe some combat mechanics too obviously. 
+
+Anyway, enjoy 0.1.3

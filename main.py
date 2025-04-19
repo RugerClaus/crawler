@@ -1,5 +1,5 @@
 from core.app.app import Window
 
 if __name__ == "__main__":
-    app = Window(version="Alpha 0.1.2")
+    app = Window(version="Alpha 0.1.3")
     app.main_loop()

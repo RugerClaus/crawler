@@ -16,7 +16,8 @@ class SoundManager:
             "magnum": "assets/audio/gunshot.mp3",
             "gold_coin": "assets/audio/coinsound1.wav",
             "silver_coin": "assets/audio/coinsound2.wav",
-            "bronze_coin": "assets/audio/coinsound3.wav"
+            "bronze_coin": "assets/audio/coinsound3.wav",
+            "player_hurt": "assets/audio/player_hurt.wav"
         }
         self.volume = volume
         self.music_active = True

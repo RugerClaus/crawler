@@ -5,7 +5,7 @@ from core.app.world.world import World
 from core.app.world.camera import Camera
 from core.state.playerstate import PLAYERSTATE
 from core.sound.sound import SoundManager
-from core.app.pause import PauseMenu
+from core.ui.pause import PauseMenu
 from core.state.manager import StateManager
 from core.state.appstate import APPSTATE
 from core.state.gamestate import GAMESTATE
@@ -13,6 +13,7 @@ from core.app.mainmenu import MainMenu
 from core.util.debugger import Debugger
 from core.app.font import FontEngine
 from core.ui.ui import UI
+from core.ui.gameover import GameOverMenu
 
 class Window():
     def __init__(self,version):
@@ -22,13 +23,13 @@ class Window():
         self.title = f"Crawler - Version: {self.version}"
         self.fps = 60
         pygame.init()
+        
         self.font = FontEngine("default").font
         self.screen = pygame.display.set_mode((self.width,self.height))
         self.clock = pygame.time.Clock()
         self.state = StateManager()
         self.world = World(self.screen, 124,124, 32,1)
-        self.world.generate_base_terrain()
-        self.world.load_from_json()
+        self.world.generate_map()
         self.player = Player(self.screen, self.world)
         self.camera = Camera(self.width, self.height)  # Add this
         self.sound = SoundManager()
@@ -40,6 +41,7 @@ class Window():
             self.go_to_menu,
             pygame.quit
         )
+        self.game_over_menu = GameOverMenu(self,self.reset_game,self.go_to_menu,pygame.quit)
         self.pause_state = False
         self.main_menu = MainMenu(
         self,
@@ -55,12 +57,24 @@ class Window():
         self.sound.stop_music()
         self.state.set_app_state(APPSTATE.GAME_ACTIVE)
         self.sound.play_music("game")
+    
+    def reset_game(self):
+        self.world = World(self.screen, 124, 124, 32, 1)  # Create a new world instance
+        self.world.generate_map()
+        self.player = Player(self.screen, self.world)  # Reset the player
+        self.player.game_over_state = False
+        self.player.current_health = self.player.max_health
+        self.ui.player = self.player
+        self.camera = Camera(self.width, self.height)  # Reset the camera
+        self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING)  # Ensure the game is active
+
 
     def go_to_menu(self):
         self.sound.stop_music()
         self.sound.play_music("menu")
         self.pause_state = False
         self.state.set_app_state(APPSTATE.MAIN_MENU)
+        self.reset_game()
         
 
     def toggle_music(self):
@@ -84,14 +98,13 @@ class Window():
             if self.state.is_app_state(APPSTATE.MAIN_MENU):
                 self.main_menu.draw()
             elif self.state.is_app_state(APPSTATE.GAME_ACTIVE):
-                if self.pause_state:
+                if self.player.game_over_state:
+                    self.game_over_menu.draw()
+                elif self.pause_state:
                     self.state.set_game_state(GAMESTATE.PAUSED)
-                else:
-                    self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING)
-
-                if self.state.is_game_state(GAMESTATE.PAUSED):
                     self.pause_menu.draw()
                 else:
+                    self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING)
                     self.handle_input()
                     self.update_world_logic()
                     self.handle_collisions()
@@ -112,8 +125,13 @@ class Window():
 
             if self.state.is_app_state(APPSTATE.MAIN_MENU):
                 self.main_menu.handle_event(event)
+
+            elif self.player.game_over_state:
+                self.game_over_menu.handle_event(event)  # <-- Add this!
+
             elif self.state.is_game_state(GAMESTATE.PAUSED):
                 self.pause_menu.handle_event(event)
+
             else:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.toggle_pause()
@@ -132,13 +150,21 @@ class Window():
             self.player.intent = PLAYERSTATE.MOVING_DOWN
         if keys[pygame.K_w]:
             self.player.intent = PLAYERSTATE.MOVING_UP
+        
+        #debug
+        if keys[pygame.K_F5]:
+            self.player.current_health -= 1
 
     def update_world_logic(self):
         self.player.update()
         for entity in self.world.entities:
             entity.update_animation()
+        for tile in self.world.damaging_tiles:
+            tile.hurt_player(self.player)
+
     def handle_collisions(self):
         self.player.check_for_coins(self.sound.play_sfx)
+        self.player.check_for_damage_sources(self.world.entities,self.sound.play_sfx)
 
     def cleanup_entities(self):
         # Placeholder for when you want to remove dead or collected entities.
