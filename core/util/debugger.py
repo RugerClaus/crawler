@@ -5,8 +5,7 @@ class Debugger:
     def __init__(self,app):
         self.surface = pygame.surface.Surface((200,150))
         self.rect = self.surface.get_rect()
-        self.rect.right = 800
-        self.rect.left = 600
+        self.rect.right = 1200
         self.app = app
         self.player = app.player
         self.font = self.app.font

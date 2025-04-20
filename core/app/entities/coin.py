@@ -3,11 +3,12 @@ from core.app.entities.animate import Animation
 
 class Coin(Item):
     def __init__(self, screen, grid_x, grid_y, tile_size, animation_frames=None, coin_type="gold",
-                 entity_id=None):
-        super().__init__(screen, grid_x, grid_y, tile_size, item_id=f"coin_{coin_type}", entity_id=entity_id)
+                 entity_id=None,item_type="coin"):
+        super().__init__(screen, grid_x, grid_y, tile_size, item_id=f"coin_{coin_type}", entity_id=entity_id,type=item_type)
 
         self.grid_x = grid_x
         self.grid_y = grid_y
+        self.type = item_type
 
         self.coin_type = coin_type
         self.value = self.set_coin_value(coin_type)

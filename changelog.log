@@ -105,3 +105,43 @@ the save file. I'm going to keep working on saving things as it appears, that's 
 I'm updating now since this was such a frustrating pipeline to work out.
 
 Anyway, enjoy 0.1.51
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.6 ---- LOG
+
+- Added saving game icon when saving game from pause menu
+I know, why should I work on a feature I'm going to depracate later? I still haven't decided if that's the case yet.
+
+- Added health potions and their functionality to the game. 
+* The icon for health potions is always displayed. It may be added after a tutorial point if I add a tutorial
+to the game.
+
+- Added discarded items to the player
+* This way when the player uses an item such as a health potion that it not only removes from the health potion/item count, 
+but also makes sure it doesn't respawn when loading a save file and allowing the player to duplicate items.
+
+** Coins are not included in the discarded items list ever. The reason for this is so that the money can be used without losing
+the fact that the coins should not respawn into the world. Maybe that will be a cheat code later. When making a game like this,
+I get to decide whatever I want.
+
+- Streamlined the way that items are collected by the player
+
+- Streamlined the way entities like "spikes" and "items" will be saved in the save file.
+
+- Completely revamped player inventory system again storing it in a dictionary.
+
+* I'm starting to see a pattern here. If I need storage of info at all, a dictionary is the way to go.
+There are a lot of steps to this and it goes all the way down to the world save functionality, but I got it added and it's extensible.
+I may have to re-engineer it again.
+
+- Added an item_type attribute to items.
+
+I may add more debugging functionality like no-clip at some point as well. 
+
+I better commit this because I've started designing a better system for storing items already. I may also streamline the entity tree.
+I'll need to also add animations for taking the health potion
+
+Anyway, enjoy 0.1.6
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------

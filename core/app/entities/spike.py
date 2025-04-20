@@ -6,6 +6,7 @@ class Spike(Entity):
         super().__init__(screen, solid=False, health=1)
         self.grid_x = grid_x
         self.grid_y = grid_y
+        self.entity_id = "spike"
         self.tile_size = tile_size
         self.image = pygame.image.load("assets/graphics/game/ground/spike.png")
         self.damage = damage

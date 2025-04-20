@@ -2,10 +2,11 @@ import pygame
 from core.app.entities.entity import Entity
 
 class Item(Entity):
-    def __init__(self, screen, grid_x, grid_y, tile_size, item_id, entity_id):
+    def __init__(self, screen, grid_x, grid_y, tile_size, item_id, entity_id,type):
         super().__init__(screen, solid=False, health=1)
         self.item_id = item_id  # Type of item (coin, potion, etc.)
         self.entity_id = entity_id  # Unique instance ID
+        self.type = type
 
         self.rect = pygame.Rect(
             grid_x * tile_size,

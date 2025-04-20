@@ -56,16 +56,42 @@ class Window():
         self.debug_enabled = False
         pygame.display.set_caption(self.title)
         self.save_manager = SaveManager()
+        self.saving_message_start_time = 0
+        self.show_saving_message = False
+
+    def toggle_saving_message(self):
+        print(f"currently saving: {self.show_saving_message}")
+        self.show_saving_message = not self.show_saving_message
+        print(f"currently saving: {self.show_saving_message}")
 
     def start_game(self):
         self.sound.stop_music()
         self.state.set_app_state(APPSTATE.GAME_ACTIVE)
+
+        if self.world is None:
+            self.world = World(self.screen, 124, 124, 32, 1)
+        else:
+            self.world.reset()  # you'd have to write this to clear entities / reset world state
+
+        if self.player is None:
+            self.player = Player(self.screen, self.world)
+        else:
+            self.player.reset(self.world)
+
+        self.world.generate_map(self.player)
+
         self.sound.play_music("game")
+        print(f"Starting new game, collected items,discarded items = {self.player.collected_items} || {self.player.discarded_items}")
+
     
     def save_game(self):
-        self.save_manager.save(self.player,self.world)
-    
+        print("Saving game...")
+        self.saving_message_start_time = pygame.time.get_ticks()
+        self.toggle_saving_message()
+        self.save_manager.save(self.player, self.world)
+        
     def load_game(self):
+        self.sound.stop_sfx()
         self.state.set_app_state(APPSTATE.GAME_ACTIVE)
         self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING)
 
@@ -88,8 +114,11 @@ class Window():
         # Create the player object with the required arguments, passing loaded coordinates
         print("Creating player object...")
         player_data = self.save_manager.loaded_data["player"]
-        self.player = Player(self.screen, self.world, player_data["x"], player_data["y"],player_data["potion_count"],player_data["money"],collected_items=player_data["collected_items"])  # Pass loaded position
+        self.player = Player(self.screen, self.world, player_data["x"], player_data["y"],
+                             player_data["potion_count"],player_data["money"],collected_items=player_data["collected_items"],
+                             discarded_items=player_data["discarded_items"])  # Pass loaded position
         self.world.generate_map(self.player)
+        
 
         # Set the player's health from the save data
         print(f"Setting player position and health: {player_data}")
@@ -108,6 +137,7 @@ class Window():
 
 
     def reset_game(self):
+        self.sound.stop_sfx()
         self.world = World(self.screen, 124, 124, 32, 1)  # Create a new world instance
         self.world.generate_map(self.player)
         self.player = Player(self.screen, self.world)  # Reset the player
@@ -117,8 +147,35 @@ class Window():
         self.camera = Camera(self.width, self.height)  # Reset the camera
         self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING)  # Ensure the game is active
 
+    def draw_saving_text(self):
+        if self.show_saving_message:
+            now = pygame.time.get_ticks()
+            elapsed = now - self.saving_message_start_time
+
+            fade_duration = 500  # fade out over 500 ms
+            visible_duration = 1000  # fully visible for 1 second
+
+            if elapsed < visible_duration:
+                alpha = 255  # full opacity
+            elif elapsed < visible_duration + fade_duration:
+                # calculate fade-out alpha
+                fade_progress = (elapsed - visible_duration) / fade_duration
+                alpha = int(255 * (1 - fade_progress))
+            else:
+                self.show_saving_message = False
+                return  # don’t draw anything after fading is done
+
+            # Render text with alpha support
+            text_surface = self.font.render("Saving Game...", True, (255, 255, 255))
+            text_surface.set_alpha(alpha)
+
+            # You must convert the surface to allow alpha per-blit (if not already):
+            text_surface = text_surface.convert_alpha()
+
+            self.screen.blit(text_surface, (50, 750))
 
     def go_to_menu(self):
+        self.sound.stop_sfx()
         self.sound.stop_music()
         self.sound.play_music("menu")
         self.pause_state = False
@@ -155,6 +212,8 @@ class Window():
                 elif self.pause_state:
                     self.state.set_game_state(GAMESTATE.PAUSED)
                     self.pause_menu.draw()
+                    self.draw_saving_text()
+                    pygame.display.flip()
                 else:
                     self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING)
                     self.handle_input()
@@ -174,6 +233,8 @@ class Window():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F9:
                     self.toggle_debug()
+                if event.key == pygame.K_1:
+                    self.player.use_health_potion()
 
             if self.state.is_app_state(APPSTATE.MAIN_MENU):
                 self.main_menu.handle_event(event)
@@ -209,13 +270,14 @@ class Window():
 
     def update_world_logic(self):
         self.player.update()
+        
         for entity in self.world.entities:
             entity.update_animation()
         for tile in self.world.damaging_tiles:
             tile.hurt_player(self.player)
 
     def handle_collisions(self):
-        self.player.check_for_coins(self.sound.play_sfx)
+        self.player.check_for_items(self.sound.play_sfx)
         self.player.check_for_damage_sources(self.world.entities,self.sound.play_sfx)
 
     def cleanup_entities(self):

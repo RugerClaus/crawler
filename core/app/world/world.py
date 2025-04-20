@@ -21,12 +21,39 @@ class World:
         self.load_foreground_tiles()
 
         self.coin_positions = {
-            "coin_0": (52,52),
-            "coin_1": (55,52),
-            "coin_2": (57,52),
-            "coin_3": (59,52)
+            "coin_0": (52,52,"gold"),
+            "coin_1": (55,52,"silver"),
+            "coin_2": (57,52,"bronze"),
+            "coin_3": (59,52,"bronze")
+        }
+        self.health_potion_positions = {
+            "health_potion_0": (82,52,"small"),
+            "health_potion_1": (85,52,"small"),
+            "health_potion_2": (88,52,"small"),
+            "health_potion_3": (91,52,"small")
         }
 
+    def reset(self, starting_level=1):
+        self.level = starting_level
+        self.tiles.clear()              # Clear static map
+        self.entities.clear()           # Clear dynamic entities
+        self.buildings.clear()          # Clear any placed buildings
+        self.damaging_tiles.clear()     # Clear spikes or traps
+        self.gold_coin_animation = None # Reset animations
+
+        # Optionally reset positions for coins and potions
+        self.coin_positions = {
+            "coin_0": (52, 52, "gold"),
+            "coin_1": (55, 52, "silver"),
+            "coin_2": (57, 52, "bronze"),
+            "coin_3": (59, 52, "bronze")
+        }
+        self.health_potion_positions = {
+            "health_potion_0": (82, 52, "small"),
+            "health_potion_1": (85, 52, "small"),
+            "health_potion_2": (88, 52, "small"),
+            "health_potion_3": (91, 52, "small")
+        }
 
     def load_assets(self):
         # Only load images once, store frames, not Animation instances
@@ -43,6 +70,9 @@ class World:
                 pygame.image.load(f"assets/graphics/game/currency/bronze_coin_{i}.png").convert_alpha()
                 for i in range(1, 4)
             ]
+        }
+        self.potion_frames = {
+            "health_potion": pygame.image.load("assets/graphics/game/items/potion/health_potion.png")
         }
 
     def load_foreground_tiles(self):
@@ -98,6 +128,7 @@ class World:
                 self.place_static(x, y, sprite, layer="object")
             draw_spike_tiles(self)
             draw_coin_tiles(self,self.coin_frames,player,self.coin_positions)
+            draw_health_potion_tiles(self,self.potion_frames,player,self.health_potion_positions)
         else:
             print("level not found")
             

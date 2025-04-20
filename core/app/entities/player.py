@@ -3,9 +3,11 @@ from core.app.entities.entity import Entity
 from core.app.entities.animate import Animation
 from core.state.playerstate import PLAYERSTATE
 from core.app.entities.coin import Coin
+from core.app.entities.items import Item
+from core.app.entities.healthpotion import HealthPotion
 
 class Player(Entity):
-    def __init__(self, screen, world,x=1984,y=1984,health_potion_count=0,money=0,collected_items=set()):
+    def __init__(self, screen, world,x=1984,y=1984,health_potion_count=0,money=0,collected_items=list(),discarded_items=list()):
         super().__init__(screen, False, 0)
         self.world = world
         self.images = self.load_player_images()
@@ -16,6 +18,7 @@ class Player(Entity):
         self.world_y = y
         self.speed_x = 0
         self.speed_y = 0
+        self.walking_speed = 5
         self.state = PLAYERSTATE.IDLE
         self.intent = PLAYERSTATE.IDLE
         self.set_animations()
@@ -26,6 +29,8 @@ class Player(Entity):
         self.health_potion_count = health_potion_count
         self.health_potion_count_max = 5
         self.collected_items = collected_items
+        self.discarded_items = discarded_items
+
 
     def load_player_images(self):
         return {
@@ -117,38 +122,104 @@ class Player(Entity):
 
         if self.intent == PLAYERSTATE.MOVING_RIGHT:
             self.state = PLAYERSTATE.MOVING_RIGHT
-            self.speed_x = 3
+            self.speed_x = self.walking_speed
         elif self.intent == PLAYERSTATE.MOVING_LEFT:
             self.state = PLAYERSTATE.MOVING_LEFT
-            self.speed_x = -3
+            self.speed_x = -self.walking_speed
         elif self.intent == PLAYERSTATE.MOVING_DOWN:
             self.state = PLAYERSTATE.MOVING_DOWN
-            self.speed_y = 3
+            self.speed_y = self.walking_speed
         elif self.intent == PLAYERSTATE.MOVING_UP:
             self.state = PLAYERSTATE.MOVING_UP
-            self.speed_y = -3
+            self.speed_y = -self.walking_speed
         else:
             self.state = PLAYERSTATE.IDLE
-    def check_for_coins(self,sound=None):
+
+    def check_for_items(self,sound=None):
         for entity in self.world.entities:
-            if isinstance(entity, Coin) and self.rect.colliderect(entity.rect):
-                self.pick_up_coin(entity)
-                if sound is not None:
-                    if entity.coin_type == "gold": 
-                        sound("gold_coin")
-                    if entity.coin_type == "silver":
-                        sound("silver_coin")
-                    if entity.coin_type == "bronze":
-                        sound("bronze_coin")
+            if isinstance(entity,Item):
+                if self.rect.colliderect(entity.rect):
+                    self.pick_up_item(entity,sound)
+            else:
+                pass
 
-    def pick_up_coin(self, coin):
-        self.money += coin.value
-        print(f"Coin picked up! Current money: {self.money}")
-
-        self.collected_items.add(coin.entity_id)  # <--- store it!
-        self.world.entities.remove(coin)  # Remove from world
+    def pick_up_item(self, item,sound):
+        if isinstance(item,HealthPotion) and self.health_potion_count < self.health_potion_count_max:
+            self.health_potion_count += 1
+            item_props = {
+                "item_id" : item.entity_id,
+                "item_type": item.type,
+                "heal_amount": item.heal_amount
+            }
+            if sound is not None:
+                sound("pick_up")
+        elif isinstance(item,Coin):
+            self.money += item.value
+            item_props = {
+                "item_id": item.entity_id,
+                "item_type": item.type,
+                "coin_type": item.coin_type
+            }
+            if sound is not None:
+                if item.coin_type == "gold": 
+                    sound("gold_coin")
+                if item.coin_type == "silver":
+                    sound("silver_coin")
+                if item.coin_type == "bronze":
+                    sound("bronze_coin")
+        else:
+            pass
         
-    def check_for_damage_sources(self, entities,sound=None):
+
+        
+        self.collected_items.append(item_props)  # <--- store it!
+        self.world.entities.remove(item)  # Remove from world
+        
+    def check_for_damage_sources(self, entities, sound=None):
         for entity in entities:
             if self.rect.colliderect(entity.rect):
-                entity.hurt_player(self,sound)
+                # Skip collected items if applicable
+                if any(item["item_id"] == getattr(entity, "entity_id", None) for item in self.collected_items):
+                    continue
+
+                entity.hurt_player(self, sound)
+
+    def use_health_potion(self):
+        if self.current_health >= self.max_health:
+            print("Can't heal past Max Health")
+            return
+
+        for item_props in self.collected_items:
+            if item_props["item_type"] == "health_potion":
+                # Heal and clamp to max health
+                self.current_health += item_props["heal_amount"]
+                self.current_health = min(self.current_health, self.max_health)
+
+                # Update inventory and stats
+                self.health_potion_count -= 1
+                self.discarded_items.append(item_props)
+                self.collected_items.remove(item_props)
+
+                # Play sound / animation hook here
+                print("Used a health potion!")
+                return
+
+        # If no potion was found
+        print("No more health potions")
+
+    def reset(self, world, x=1984, y=1984):
+        self.world = world
+        self.world_x = x
+        self.world_y = y
+        self.rect.centerx = x
+        self.rect.centery = y
+        self.speed_x = 0
+        self.speed_y = 0
+        self.state = PLAYERSTATE.IDLE
+        self.intent = PLAYERSTATE.IDLE
+        self.money = 0
+        self.current_health = 150
+        self.game_over_state = False
+        self.health_potion_count = 0
+        self.collected_items.clear()
+        self.discarded_items.clear()

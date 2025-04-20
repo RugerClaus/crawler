@@ -1,6 +1,7 @@
 import pygame
 from core.app.entities.coin import Coin
 from core.app.entities.spike import Spike
+from core.app.entities.healthpotion import HealthPotion
 
 def draw_house_tiles(terrain_tiles):
     house_tiles = []
@@ -179,17 +180,37 @@ def draw_spike_tiles(world):
         world.entities.append(spike)
 
 def draw_coin_tiles(world, coin_frames, player, positions):
-    for entity_id, (grid_x, grid_y) in positions.items():
-        if entity_id in player.collected_items:
-            continue  # skip coins the player already grabbed
+    for entity_id, (grid_x, grid_y, coin_type) in positions.items():
+        # Skip if this coin was already collected
+        if any(item["item_id"] == entity_id for item in player.collected_items):
+            continue
 
         coin = Coin(
             world.screen,
             grid_x,
             grid_y,
             world.tile_size,
-            animation_frames=coin_frames["gold"],
-            coin_type="gold",
+            animation_frames=coin_frames[coin_type],
+            coin_type=coin_type,
             entity_id=entity_id
         )
         world.entities.append(coin)
+
+
+def draw_health_potion_tiles(world, potion_frames, player, positions):
+    for entity_id, (grid_x, grid_y, potion_type) in positions.items():
+        # Skip if this potion was already collected
+        if any(item["item_id"] == entity_id for item in player.collected_items):
+            continue
+
+        health_potion = HealthPotion(
+            world.screen,
+            grid_x,
+            grid_y,
+            world.tile_size,
+            potion_type=potion_type,
+            image=potion_frames["health_potion"],
+            entity_id=entity_id
+        )
+        print(f"Health potion spawned at ({grid_x},{grid_y})")
+        world.entities.append(health_potion)

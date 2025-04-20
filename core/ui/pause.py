@@ -2,6 +2,7 @@
 
 import pygame
 from core.ui.button import Button
+from core.app.font import FontEngine
 
 class PauseMenu:
     def __init__(self, app, resume_callback, music_toggle_callback, sfx_toggle_callback, go_to_menu_callback, save_callback, quit_callback):
@@ -14,6 +15,9 @@ class PauseMenu:
         self.go_to_menu_callback = go_to_menu_callback
         self.save_callback = save_callback
         self.quit_callback = quit_callback
+        self.show_saving_message = False
+        self.saving_message_start_time = 0
+        self.font = FontEngine("button").font
 
         self.create_buttons()
 
@@ -36,6 +40,8 @@ class PauseMenu:
         for button in self.buttons:
             button.draw(self.screen, mouse_pos)
 
+
+
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             mouse_pos = pygame.mouse.get_pos()
@@ -46,3 +52,5 @@ class PauseMenu:
                 self.resume_callback()
         if event.type == pygame.QUIT:
             pygame.quit()
+
+    
