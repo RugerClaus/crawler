@@ -5,7 +5,7 @@ from core.state.playerstate import PLAYERSTATE
 from core.app.entities.coin import Coin
 
 class Player(Entity):
-    def __init__(self, screen, world,x=1984,y=1984,health_potion_count=0):
+    def __init__(self, screen, world,x=1984,y=1984,health_potion_count=0,money=0,collected_items=set()):
         super().__init__(screen, False, 0)
         self.world = world
         self.images = self.load_player_images()
@@ -19,12 +19,13 @@ class Player(Entity):
         self.state = PLAYERSTATE.IDLE
         self.intent = PLAYERSTATE.IDLE
         self.set_animations()
-        self.money = 0
+        self.money = money
         self.current_health = 150
         self.max_health = 150
         self.game_over_state = False
         self.health_potion_count = health_potion_count
         self.health_potion_count_max = 5
+        self.collected_items = collected_items
 
     def load_player_images(self):
         return {
@@ -141,13 +142,12 @@ class Player(Entity):
                         sound("bronze_coin")
 
     def pick_up_coin(self, coin):
-        # Increase score or add coin to inventory
-        self.money += coin.value  # Add to score (or modify inventory if needed)
+        self.money += coin.value
         print(f"Coin picked up! Current money: {self.money}")
-        
-        # Remove the coin from the world
-        self.world.entities.remove(coin)  # <-- removes the coin from the world
 
+        self.collected_items.add(coin.entity_id)  # <--- store it!
+        self.world.entities.remove(coin)  # Remove from world
+        
     def check_for_damage_sources(self, entities,sound=None):
         for entity in entities:
             if self.rect.colliderect(entity.rect):

@@ -20,6 +20,13 @@ class World:
         self.load_object_tiles()
         self.load_foreground_tiles()
 
+        self.coin_positions = {
+            "coin_0": (52,52),
+            "coin_1": (55,52),
+            "coin_2": (57,52),
+            "coin_3": (59,52)
+        }
+
 
     def load_assets(self):
         # Only load images once, store frames, not Animation instances
@@ -70,7 +77,7 @@ class World:
                 self.tiles[(x, y)] = {key: None for key in valid_layers}
             self.tiles[(x, y)][layer] = obj
 
-    def generate_map(self):
+    def generate_map(self,player):
 
         if self.level == 1:
             default_tiles = draw_default_tiles(self.grid_height,self.grid_width,self.terrain_tiles)
@@ -90,7 +97,7 @@ class World:
                 x, y = position
                 self.place_static(x, y, sprite, layer="object")
             draw_spike_tiles(self)
-            draw_coin_tiles(self,self.coin_frames)
+            draw_coin_tiles(self,self.coin_frames,player,self.coin_positions)
         else:
             print("level not found")
             

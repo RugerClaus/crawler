@@ -30,8 +30,8 @@ class Window():
         self.clock = pygame.time.Clock()
         self.state = StateManager()
         self.world = World(self.screen, 124,124, 32,1)
-        self.world.generate_map()
         self.player = Player(self.screen, self.world)
+        self.world.generate_map(self.player)
         self.camera = Camera(self.width, self.height)  # Add this
         self.sound = SoundManager()
         self.pause_menu = PauseMenu(
@@ -83,13 +83,14 @@ class Window():
         print(f"Loaded level: {saved_level}")
         
         self.world.level = saved_level
-        self.world.generate_map()
+        
 
         # Create the player object with the required arguments, passing loaded coordinates
         print("Creating player object...")
         player_data = self.save_manager.loaded_data["player"]
-        self.player = Player(self.screen, self.world, player_data["x"], player_data["y"],player_data["potion_count"])  # Pass loaded position
-        
+        self.player = Player(self.screen, self.world, player_data["x"], player_data["y"],player_data["potion_count"],player_data["money"],collected_items=player_data["collected_items"])  # Pass loaded position
+        self.world.generate_map(self.player)
+
         # Set the player's health from the save data
         print(f"Setting player position and health: {player_data}")
         self.player.current_health = player_data["health"]
@@ -108,7 +109,7 @@ class Window():
 
     def reset_game(self):
         self.world = World(self.screen, 124, 124, 32, 1)  # Create a new world instance
-        self.world.generate_map()
+        self.world.generate_map(self.player)
         self.player = Player(self.screen, self.world)  # Reset the player
         self.player.game_over_state = False
         self.player.current_health = self.player.max_health

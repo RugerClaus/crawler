@@ -13,14 +13,25 @@ class SaveManager:
                 "x": player.rect.x,
                 "y": player.rect.y,
                 "health": player.current_health,
-                "potion_count": player.health_potion_count
+                "potion_count": player.health_potion_count,
+                "money": player.money,
+                "collected_items": list(player.collected_items)
             },
             "level": world.level,  # Save the current level
-            "entities": [
-                entity.to_dict()
-                for entity in world.entities
-            ]
+            "entities": []
         }
+        for entity in world.entities:
+            if isinstance(entity, Coin) and entity.entity_id not in player.collected_items:
+                data['entities'].append({
+                    'type': 'Coin',
+                    'grid_x': entity.grid_x,
+                    'grid_y': entity.grid_y,
+                    'coin_type': entity.coin_type,
+                    'entity_id': entity.entity_id
+                })
+            else:
+                # Handle other entity types here...
+                pass
 
         # Save the data to a JSON file
         with open(self.filepath, "w") as f:
@@ -44,22 +55,24 @@ class SaveManager:
         saved_level = data.get("level")
         if saved_level is not None:
             world.level = saved_level  # Set the world to the saved level
-            world.generate_map()  # Generate the map for the correct level
+            world.generate_map(player)  # Generate the map for the correct level
         else:
             print("[SAVE] No level data found, using default level.")
-            world.generate_map()  # Generate the map for the default level
+            world.generate_map(player)  # Generate the map for the default level
 
         # Load player data
         player.rect.centerx = data["player"]["x"]
         player.rect.centery = data["player"]["y"]
         player.current_health = data["player"]["health"]
-        player.potion_count = data["player"]["potion_count"]
+        player.health_potion_count = data["player"]["potion_count"]
+        player.money = data["player"]["money"]
+        player.collected_items = data["player"]["collected_items"]
 
         # Load entities
         world.entities = []
         for entity_data in data["entities"]:
             entity_type = entity_data["type"]
-            x, y = entity_data["x"], entity_data["y"]
+            x, y = entity_data["grid_x"], entity_data["grid_y"]
 
             if entity_type == "Spike":
                 grid_x = entity_data["grid_x"]
@@ -71,13 +84,16 @@ class SaveManager:
                 world.entities.append(spike)
 
             elif entity_type == "Coin":
-                coin_type = entity_data["coin_type"]
-                # Get animation frames or pass an empty list
-                animation_frames = []  # Assuming no animation frames are saved, fallback to empty list
-                coin = Coin(world.screen, entity_data["grid_x"], entity_data["grid_y"], world.tile_size, animation_frames, coin_type)
-                coin.rect.x = x
-                coin.rect.y = y
-                world.entities.append(coin)
+                if entity_data["entity_id"] in player.collected_items:
+                    continue
+                else:
+                    coin_type = entity_data["coin_type"]
+                    # Get animation frames or pass an empty list
+                    animation_frames = []  # Assuming no animation frames are saved, fallback to empty list
+                    coin = Coin(world.screen, entity_data["grid_x"], entity_data["grid_y"], world.tile_size, animation_frames, coin_type)
+                    coin.rect.x = x
+                    coin.rect.y = y
+                    world.entities.append(coin)
 
         print(f"[SAVE] Game loaded from {self.filepath}")
         print(f"player coords: ({data['player']['x']},{data['player']['y']})")

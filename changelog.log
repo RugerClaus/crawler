@@ -91,3 +91,17 @@ Alpha 0.1.5 ---- LOG
 - Saving handles number of potions on player for loading games.
 
 Overall solid update. The next update will have workable potions and more. 
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.51 ---- LOG
+
+Overall it's a short update
+
+-fixed coins not being properly kept out of world if they are in the player save file by ID. That now works and if you load a saved game, the collected items, as
+long as they're kept by id in a dictionary in the World object, and stored by ID on the player object, then I can dynamically load or unload them depending on the contents of
+the save file. I'm going to keep working on saving things as it appears, that's going to need to be updated quite often every time I add something new that needs to be saved
+
+I'm updating now since this was such a frustrating pipeline to work out.
+
+Anyway, enjoy 0.1.51

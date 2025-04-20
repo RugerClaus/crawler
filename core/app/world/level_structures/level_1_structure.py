@@ -178,15 +178,18 @@ def draw_spike_tiles(world):
         )
         world.entities.append(spike)
 
-def draw_coin_tiles(world, coin_frames):
-    positions = [(55, 55)]
-    for grid_x, grid_y in positions:
+def draw_coin_tiles(world, coin_frames, player, positions):
+    for entity_id, (grid_x, grid_y) in positions.items():
+        if entity_id in player.collected_items:
+            continue  # skip coins the player already grabbed
+
         coin = Coin(
-            world.screen,  # pass the screen or surface here
+            world.screen,
             grid_x,
             grid_y,
             world.tile_size,
-            coin_frames["gold"],  # or use another type's frames
-            "gold"  # define the coin type for value assignment
+            animation_frames=coin_frames["gold"],
+            coin_type="gold",
+            entity_id=entity_id
         )
         world.entities.append(coin)
