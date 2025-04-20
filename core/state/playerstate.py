@@ -5,3 +5,4 @@ class PLAYERSTATE(Enum):
     MOVING_DOWN = auto()
     MOVING_LEFT = auto()
     MOVING_RIGHT = auto()
+    DEAD = auto()

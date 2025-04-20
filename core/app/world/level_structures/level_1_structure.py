@@ -48,7 +48,7 @@ def draw_building_walls(object_tiles):
     #top wall
     for x in range(50,70):
         for y in range(49,50):
-            tile = object_tiles.get("wall", object_tiles["missing_texture"])
+            tile = object_tiles.get("wall2", object_tiles["missing_texture"])
 
             ground_sprite = pygame.sprite.Sprite()
             ground_sprite.image = tile.image
@@ -59,7 +59,7 @@ def draw_building_walls(object_tiles):
     #bottom wall left half
     for x in range(50,58):
         for y in range(69,70):
-            tile = object_tiles.get("wall", object_tiles["missing_texture"])
+            tile = object_tiles.get("wall2", object_tiles["missing_texture"])
 
             ground_sprite = pygame.sprite.Sprite()
             ground_sprite.image = tile.image
@@ -70,7 +70,7 @@ def draw_building_walls(object_tiles):
     #bottom wall right half
     for x in range(62,70):
         for y in range(69,70):
-            tile = object_tiles.get("wall", object_tiles["missing_texture"])
+            tile = object_tiles.get("wall2", object_tiles["missing_texture"])
 
             ground_sprite = pygame.sprite.Sprite()
             ground_sprite.image = tile.image
@@ -81,7 +81,7 @@ def draw_building_walls(object_tiles):
     #left wall
     for x in range(49,50):
         for y in range(49,70):
-            tile = object_tiles.get("wall", object_tiles["missing_texture"])
+            tile = object_tiles.get("wall2", object_tiles["missing_texture"])
 
             ground_sprite = pygame.sprite.Sprite()
             ground_sprite.image = tile.image
@@ -92,7 +92,7 @@ def draw_building_walls(object_tiles):
     #right wall
     for x in range(69,70):
         for y in range(50,69):
-            tile = object_tiles.get("wall", object_tiles["missing_texture"])
+            tile = object_tiles.get("wall2", object_tiles["missing_texture"])
 
             ground_sprite = pygame.sprite.Sprite()
             ground_sprite.image = tile.image
@@ -168,7 +168,7 @@ def draw_level_border(object_tiles):
     return level_border_tiles
 
 def draw_spike_tiles(world):
-    positions = [(65, 65)]
+    positions = [(58, 79)]
     for grid_x, grid_y in positions:
         spike = Spike(
             world.screen,  # pass the screen or surface here
@@ -179,7 +179,7 @@ def draw_spike_tiles(world):
         world.entities.append(spike)
 
 def draw_coin_tiles(world, coin_frames):
-    positions = [(55, 55), (60, 60), (65, 65)]
+    positions = [(55, 55)]
     for grid_x, grid_y in positions:
         coin = Coin(
             world.screen,  # pass the screen or surface here

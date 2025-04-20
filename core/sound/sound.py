@@ -1,7 +1,7 @@
 import pygame
 
 class SoundManager:
-    def __init__(self, volume=0.5):
+    def __init__(self, volume=0.3):
         pygame.mixer.init()
         self.music_tracks = {
             "menu": "assets/audio/menu_music.wav",
@@ -17,7 +17,8 @@ class SoundManager:
             "gold_coin": "assets/audio/coinsound1.wav",
             "silver_coin": "assets/audio/coinsound2.wav",
             "bronze_coin": "assets/audio/coinsound3.wav",
-            "player_hurt": "assets/audio/player_hurt.wav"
+            "player_hurt": "assets/audio/player_hurt.wav",
+            "game_over": "assets/audio/game_over.wav"
         }
         self.volume = volume
         self.music_active = True

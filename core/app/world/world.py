@@ -56,6 +56,7 @@ class World:
     def load_object_tiles(self):
         self.object_tiles = {
             "wall": Tile("assets/graphics/game/walls/shittywall.png",is_walkable=False),
+            "wall2": Tile("assets/graphics/game/walls/wall2.png", is_walkable=False),
             "missing_texture": Tile("assets/graphics/game/undefined.png")
         }
 
@@ -89,6 +90,7 @@ class World:
                 x, y = position
                 self.place_static(x, y, sprite, layer="object")
             draw_spike_tiles(self)
+            draw_coin_tiles(self,self.coin_frames)
         else:
             print("level not found")
             

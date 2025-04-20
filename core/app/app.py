@@ -18,7 +18,7 @@ from core.util.savemanager import SaveManager
 
 class Window():
     def __init__(self,version):
-        self.width = 800
+        self.width = 1200
         self.height = 800
         self.version = version
         self.title = f"Crawler - Version: {self.version}"
@@ -43,7 +43,7 @@ class Window():
             self.save_game,
             pygame.quit
         )
-        self.game_over_menu = GameOverMenu(self,self.reset_game,self.go_to_menu,pygame.quit)
+        self.game_over_menu = GameOverMenu(self,self.reset_game,self.go_to_menu,self.load_game,pygame.quit)
         self.pause_state = False
         self.main_menu = MainMenu(
         self,
@@ -88,7 +88,7 @@ class Window():
         # Create the player object with the required arguments, passing loaded coordinates
         print("Creating player object...")
         player_data = self.save_manager.loaded_data["player"]
-        self.player = Player(self.screen, self.world, player_data["x"], player_data["y"])  # Pass loaded position
+        self.player = Player(self.screen, self.world, player_data["x"], player_data["y"],player_data["potion_count"])  # Pass loaded position
         
         # Set the player's health from the save data
         print(f"Setting player position and health: {player_data}")
@@ -144,10 +144,13 @@ class Window():
             self.handle_events()
 
             if self.state.is_app_state(APPSTATE.MAIN_MENU):
+                self.main_menu.update()
                 self.main_menu.draw()
             elif self.state.is_app_state(APPSTATE.GAME_ACTIVE):
                 if self.player.game_over_state:
                     self.game_over_menu.draw()
+                    self.sound.stop_music()
+                    self.sound.play_sfx("game_over")
                 elif self.pause_state:
                     self.state.set_game_state(GAMESTATE.PAUSED)
                     self.pause_menu.draw()

@@ -12,18 +12,13 @@ class SaveManager:
             "player": {
                 "x": player.rect.x,
                 "y": player.rect.y,
-                "health": player.current_health
+                "health": player.current_health,
+                "potion_count": player.health_potion_count
             },
             "level": world.level,  # Save the current level
             "entities": [
-                {
-                    "type": type(entity).__name__,
-                    "x": getattr(entity, 'rect', entity).x,
-                    "y": getattr(entity, 'rect', entity).y,
-                    "grid_x": getattr(entity, 'grid_x', 0),
-                    "grid_y": getattr(entity, 'grid_y', 0),
-                    "damage": getattr(entity, 'damage', 1)
-                } for entity in world.entities
+                entity.to_dict()
+                for entity in world.entities
             ]
         }
 
@@ -55,9 +50,10 @@ class SaveManager:
             world.generate_map()  # Generate the map for the default level
 
         # Load player data
-        player.rect.x = data["player"]["x"]
-        player.rect.y = data["player"]["y"]
+        player.rect.centerx = data["player"]["x"]
+        player.rect.centery = data["player"]["y"]
         player.current_health = data["player"]["health"]
+        player.potion_count = data["player"]["potion_count"]
 
         # Load entities
         world.entities = []
@@ -75,10 +71,12 @@ class SaveManager:
                 world.entities.append(spike)
 
             elif entity_type == "Coin":
-                coin = Coin(x, y)
+                coin_type = entity_data["coin_type"]
+                # Get animation frames or pass an empty list
+                animation_frames = []  # Assuming no animation frames are saved, fallback to empty list
+                coin = Coin(world.screen, entity_data["grid_x"], entity_data["grid_y"], world.tile_size, animation_frames, coin_type)
                 coin.rect.x = x
                 coin.rect.y = y
-                coin.damage = entity_data.get("damage", 1)
                 world.entities.append(coin)
 
         print(f"[SAVE] Game loaded from {self.filepath}")

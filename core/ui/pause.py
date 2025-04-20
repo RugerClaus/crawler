@@ -19,12 +19,12 @@ class PauseMenu:
 
     def create_buttons(self):
         self.buttons = [
-            Button("Resume", 640, 75, 170, 50, (173, 216, 230), (255, 255, 255), self.resume_callback),
-            Button(f"Music: {self.window.sound.music_status()}", 640, 150, 170, 50, (173, 216, 230), (255, 255, 255), self.music_toggle_callback),
-            Button(f"SFX: {self.window.sound.sfx_status()}", 640, 225, 170, 50, (173, 216, 230), (255, 255, 255), self.sfx_toggle_callback),
-            Button(f"Menu", 640, 300, 170, 50, (173, 216, 230), (255, 255, 255), self.go_to_menu_callback),
-            Button(f"Save Game",640,375,170,50,(173,216,230),(255,255,255),self.save_callback),
-            Button("Exit", 640, 450, 170, 50, (173, 216, 230), (255, 255, 255), self.quit_callback),
+            Button("Resume", 1000, 75, 170, 50, (173, 216, 230), (255, 255, 255), self.resume_callback),
+            Button(f"Music: {self.window.sound.music_status()}", 1000, 150, 170, 50, (173, 216, 230), (255, 255, 255), self.music_toggle_callback),
+            Button(f"SFX: {self.window.sound.sfx_status()}", 1000, 225, 170, 50, (173, 216, 230), (255, 255, 255), self.sfx_toggle_callback),
+            Button(f"Menu", 1000, 300, 170, 50, (173, 216, 230), (255, 255, 255), self.go_to_menu_callback),
+            Button(f"Save Game",1000,375,170,50,(173,216,230),(255,255,255),self.save_callback),
+            Button("Exit", 1000, 450, 170, 50, (173, 216, 230), (255, 255, 255), self.quit_callback),
         ]
 
     def update_labels(self):

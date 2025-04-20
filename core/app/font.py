@@ -9,6 +9,8 @@ class FontEngine():
             self.button_font()
         elif self.type == "UI":
             self.ui_font()
+        elif self.type == "GameOver":
+            self.game_over_font()
         else:
             self.default_font()
 
@@ -17,6 +19,8 @@ class FontEngine():
         
     def ui_font(self):
         self.font = pygame.font.Font('assets/font/Pixeltype.ttf', 40)
+    def game_over_font(self):
+        self.font = pygame.font.Font('assets/font/Pixeltype.ttf', 120)
 
     def default_font(self):
         self.font = pygame.font.Font('assets/font/Pixeltype.ttf', 25)

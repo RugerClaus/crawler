@@ -5,15 +5,15 @@ from core.state.playerstate import PLAYERSTATE
 from core.app.entities.coin import Coin
 
 class Player(Entity):
-    def __init__(self, screen, world,x=1984,y=1984):
+    def __init__(self, screen, world,x=1984,y=1984,health_potion_count=0):
         super().__init__(screen, False, 0)
         self.world = world
         self.images = self.load_player_images()
         self.image = self.images["IDLE"][0]
         self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = x, y
-        self.world_x = self.rect.x
-        self.world_y = self.rect.y
+        self.rect.centerx, self.rect.centery = x, y
+        self.world_x = x
+        self.world_y = y
         self.speed_x = 0
         self.speed_y = 0
         self.state = PLAYERSTATE.IDLE
@@ -23,6 +23,8 @@ class Player(Entity):
         self.current_health = 150
         self.max_health = 150
         self.game_over_state = False
+        self.health_potion_count = health_potion_count
+        self.health_potion_count_max = 5
 
     def load_player_images(self):
         return {
@@ -86,6 +88,7 @@ class Player(Entity):
         self.coords = (self.world_x, self.world_y)
 
         if self.current_health <= 0:
+            self.state = PLAYERSTATE.DEAD
             self.health = 0
             self.game_over_state = True
 
@@ -101,6 +104,8 @@ class Player(Entity):
             self.play_animation("MOVING_DOWN")
         elif self.state == PLAYERSTATE.MOVING_UP:
             self.play_animation("MOVING_UP")
+        elif self.state == PLAYERSTATE.DEAD:
+            self.play_animation("DEAD")
         else:
             self.state = PLAYERSTATE.IDLE
             self.play_animation("IDLE")

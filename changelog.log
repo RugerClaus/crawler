@@ -77,3 +77,17 @@ I figured I'd better stop here and updated before I start working on any other f
 Now has README
 
 Anyway, enjoy 0.1.4
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.5 ---- LOG
+
+- Made minor adjustments to save logic
+- Added new font GameOver font
+- Gave a load functionality to game over so you can load from a recent save. I will probably drop the save button in favor of checkpoints.
+- Revamped the main menu and changed the aspect ratio to a more modern widescreen in preparation for screen size changing mechanics
+- Heavily modified the Player UI, and it now has a border
+- Player UI shows number of health potions player is carrying out of max
+- Saving handles number of potions on player for loading games.
+
+Overall solid update. The next update will have workable potions and more. 

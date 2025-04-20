@@ -1,18 +1,28 @@
 {
     "player": {
-        "x": 1751,
-        "y": 1663,
-        "health": 140
+        "x": 1950,
+        "y": 1942,
+        "health": 150,
+        "potion_count": 2
     },
     "level": 1,
     "entities": [
         {
             "type": "Spike",
-            "x": 2080,
-            "y": 2080,
-            "grid_x": 65,
-            "grid_y": 65,
+            "x": 1856,
+            "y": 2528,
+            "grid_x": 58,
+            "grid_y": 79,
             "damage": 10
+        },
+        {
+            "type": "Coin",
+            "x": 1760,
+            "y": 1760,
+            "grid_x": 55,
+            "grid_y": 55,
+            "coin_type": "gold",
+            "value": 100
         }
     ]
 }

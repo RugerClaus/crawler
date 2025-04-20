@@ -5,28 +5,38 @@ from core.app.font import FontEngine
 class PlayerUI:
 
     def __init__(self, app):
-        self.surface = pygame.surface.Surface((100, 400), pygame.SRCALPHA)
+        self.surface = pygame.surface.Surface((150, app.screen.get_height()), pygame.SRCALPHA)
         self.rect = self.surface.get_rect()
         self.app = app
         self.font = FontEngine("UI").font
         self.font2 = FontEngine("default").font
         self.player = self.app.player
+        self.health_potion_image = pygame.image.load("assets/graphics/game/items/potion/health_potion.png").convert_alpha()
+        self.potion_rect = self.health_potion_image.get_rect(center=(25,300))
+        self.ui_border = pygame.surface.Surface((10,self.rect.height))
+        self.ui_border_rect = self.ui_border.get_rect(topleft = (140,0))
 
     def draw(self, screen):
         self.surface.fill((0, 0, 0, 0))
         self.draw_health_bar()
+        self.surface.blit(self.ui_border,self.ui_border_rect)
         
         money_text = f"$: {self.player.money}"
         money_text_surface = self.font.render(money_text, True, (255, 255, 255))
         self.surface.blit(money_text_surface, (10, 10))
 
-        health_text = f"Health: \n{self.player.current_health}/{self.player.max_health}"
+        health_text = f"Health: {self.player.current_health}/{self.player.max_health}"
         health_text_surface = self.font2.render(health_text, True, (255, 255, 255))
-        self.surface.blit(health_text_surface, (10, 40))
+        self.surface.blit(health_text_surface, (10, 55))
+
+        self.surface.blit(self.health_potion_image,self.potion_rect)
+        health_potion_count_text = f" : {self.player.health_potion_count}/{self.player.health_potion_count_max}"
+        health_potion_count_text_surface = self.font.render(health_potion_count_text,True,(255,255,255))
+        self.surface.blit(health_potion_count_text_surface,(50,300))
         
         level_text = f"L: {self.app.world.level}"
         level_text_surface = self.font.render(level_text, True, (255, 255, 255))
-        self.surface.blit(level_text_surface, (10, 350))
+        self.surface.blit(level_text_surface, (10, 700))
         
         screen.blit(self.surface, self.rect)
 
