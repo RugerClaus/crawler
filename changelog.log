@@ -145,3 +145,11 @@ I'll need to also add animations for taking the health potion
 Anyway, enjoy 0.1.6
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.61 ---- LOG
+
+- Made it so Load Game is grayed out on the menu if no save file exists, and put saves in .gitignore
+
+- Streamlined save system yet again.
+* I was getting a problem with the game removing items after the game was saved.
+I was reinstantiating the MainMenu in the save game function so that the load game button wouldn't be grayed out

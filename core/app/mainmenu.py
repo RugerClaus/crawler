@@ -14,11 +14,18 @@ class MainMenu:
         ]
         self.background_animation = Animation(bg_frames, frame_delay=3)
 
-        self.buttons = [
-            Button("New Game", 600, 400, 200, 50, (255, 255, 255), (200, 200, 0), new_game_callback),
-            Button("Load Game", 600, 500, 200, 50, (255, 255, 255), (200, 200, 0), load_callback),
-            Button("Quit", 600, 600, 200, 50, (255, 255, 255), (200, 200, 0), quit_calback)
-        ]
+        if self.window.save_manager.load(self.window.player,self.window.world) == False:
+            self.buttons = [
+                Button("New Game", 600, 400, 200, 50, (255, 255, 255), (200, 200, 0), new_game_callback),
+                Button("Load Game", 600, 500, 200, 50, (128, 128, 128), (128, 128, 128), None),
+                Button("Quit", 600, 600, 200, 50, (255, 255, 255), (200, 200, 0), quit_calback)
+            ]
+        else:
+            self.buttons = [
+                Button("New Game", 600, 400, 200, 50, (255, 255, 255), (200, 200, 0), new_game_callback),
+                Button("Load Game", 600, 500, 200, 50, (255, 255, 255), (200, 200, 0), load_callback),
+                Button("Quit", 600, 600, 200, 50, (255, 255, 255), (200, 200, 0), quit_calback)
+            ]
 
         self.title_image = pygame.image.load("assets/graphics/game/title.png").convert_alpha()
         self.title_rect = self.title_image.get_rect(center=(self.screen.get_width() // 2, 200))

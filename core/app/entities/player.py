@@ -153,6 +153,8 @@ class Player(Entity):
             }
             if sound is not None:
                 sound("pick_up")
+            self.collected_items.append(item_props)
+            self.world.entities.remove(item)
         elif isinstance(item,Coin):
             self.money += item.value
             item_props = {
@@ -167,13 +169,11 @@ class Player(Entity):
                     sound("silver_coin")
                 if item.coin_type == "bronze":
                     sound("bronze_coin")
+            self.collected_items.append(item_props)
+            self.world.entities.remove(item)
         else:
             pass
         
-
-        
-        self.collected_items.append(item_props)  # <--- store it!
-        self.world.entities.remove(item)  # Remove from world
         
     def check_for_damage_sources(self, entities, sound=None):
         for entity in entities:

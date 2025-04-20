@@ -24,7 +24,7 @@ class Window():
         self.title = f"Crawler - Version: {self.version}"
         self.fps = 60
         pygame.init()
-        
+        self.save_manager = SaveManager()
         self.font = FontEngine("default").font
         self.screen = pygame.display.set_mode((self.width,self.height))
         self.clock = pygame.time.Clock()
@@ -55,7 +55,6 @@ class Window():
         self.debug = Debugger(self)
         self.debug_enabled = False
         pygame.display.set_caption(self.title)
-        self.save_manager = SaveManager()
         self.saving_message_start_time = 0
         self.show_saving_message = False
 
@@ -86,9 +85,11 @@ class Window():
     
     def save_game(self):
         print("Saving game...")
+        print(f"Entities before save: {len(self.world.entities)}")
         self.saving_message_start_time = pygame.time.get_ticks()
         self.toggle_saving_message()
         self.save_manager.save(self.player, self.world)
+        print(f"Entities after save: {len(self.world.entities)}")
         
     def load_game(self):
         self.sound.stop_sfx()
@@ -179,6 +180,12 @@ class Window():
         self.sound.stop_music()
         self.sound.play_music("menu")
         self.pause_state = False
+        self.main_menu = MainMenu(
+        self,
+        self.start_game,
+        self.load_game,
+        pygame.quit
+        )
         self.state.set_app_state(APPSTATE.MAIN_MENU)
         self.reset_game()
         
