@@ -200,7 +200,7 @@ def draw_coin_tiles(world, coin_frames, player, positions):
 def draw_health_potion_tiles(world, potion_frames, player, positions):
     for entity_id, (grid_x, grid_y, potion_type) in positions.items():
         # Skip if this potion was already collected
-        if any(item["item_id"] == entity_id for item in player.collected_items):
+        if any(item["item_id"] == entity_id for item in player.collected_items) or any(item["item_id"] == entity_id for item in player.discarded_items):
             continue
 
         health_potion = HealthPotion(

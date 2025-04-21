@@ -15,8 +15,24 @@ class PlayerUI:
         self.potion_rect = self.health_potion_image.get_rect(center=(25,300))
         self.ui_border = pygame.surface.Surface((10,self.rect.height))
         self.ui_border_rect = self.ui_border.get_rect(topleft = (140,0))
+        self.potion_warning_start_time = None
+        self.potion_text_color = (255,255,255)
 
     def draw(self, screen):
+        if self.potion_warning_start_time is not None:
+            now = pygame.time.get_ticks()
+            elapsed = now - self.potion_warning_start_time
+
+            if elapsed >= 200:
+                self.potion_text_color = (255, 255, 255)  # Reset to white
+                self.potion_warning_start_time = None
+            else:
+                # Linear interpolation between red and white
+                t = elapsed / 500
+                r = 255
+                g = int(0 + t * (255 - 0))
+                b = int(0 + t * (255 - 0))
+                self.potion_text_color = (r, g, b)
         self.surface.fill((0, 0, 0, 0))
         self.draw_health_bar()
         self.surface.blit(self.ui_border,self.ui_border_rect)
@@ -26,13 +42,15 @@ class PlayerUI:
         self.surface.blit(money_text_surface, (10, 10))
 
         health_text = f"Health: {self.player.current_health}/{self.player.max_health}"
-        health_text_surface = self.font2.render(health_text, True, (255, 255, 255))
+        health_text_surface = self.font2.render(health_text, True, (255,255,255))
         self.surface.blit(health_text_surface, (10, 55))
 
         self.surface.blit(self.health_potion_image,self.potion_rect)
         health_potion_count_text = f" : {self.player.health_potion_count}/{self.player.health_potion_count_max}"
-        health_potion_count_text_surface = self.font.render(health_potion_count_text,True,(255,255,255))
+        health_potion_count_text_surface = self.font.render(health_potion_count_text,True,self.potion_text_color)
         self.surface.blit(health_potion_count_text_surface,(50,300))
+
+
         
         level_text = f"L: {self.app.world.level}"
         level_text_surface = self.font.render(level_text, True, (255, 255, 255))

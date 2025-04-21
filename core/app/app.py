@@ -9,6 +9,7 @@ from core.ui.pause import PauseMenu
 from core.state.manager import StateManager
 from core.state.appstate import APPSTATE
 from core.state.gamestate import GAMESTATE
+from core.state.enemystate import ENEMYSTATE
 from core.app.mainmenu import MainMenu
 from core.util.debugger import Debugger
 from core.app.font import FontEngine
@@ -244,9 +245,18 @@ class Window():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F9:
                     self.toggle_debug()
+                if event.key == pygame.K_F1:
+                    self.world.generate_enemy()
+                if event.key == pygame.K_g:
+                    for enemy in self.world.enemies:
+                        enemy.intent = ENEMYSTATE.PATROLLING
+                        print(f"Setting enemy intent to PATROLLING: {enemy.intent}")  # Debug statement to confirm update
+                if event.key == pygame.K_h:
+                    for enemy in self.world.enemies:
+                        enemy.intent = ENEMYSTATE.IDLE
+                        print(f"Setting enemy intent to IDLE: {enemy.intent}")  # Debug statement to confirm update
                 if event.key == pygame.K_1:
-                    self.player.use_health_potion()
-                    self.sound.play_sfx("drink_potion")
+                    self.player.use_health_potion(self.sound.play_sfx,self.ui)        
 
             if self.state.is_app_state(APPSTATE.MAIN_MENU):
                 self.main_menu.handle_event(event)
@@ -288,6 +298,7 @@ class Window():
         for tile in self.world.damaging_tiles:
             tile.hurt_player(self.player)
 
+
     def handle_collisions(self):
         self.player.check_for_items(self.sound.play_sfx)
         self.player.check_for_damage_sources(self.world.entities,self.sound.play_sfx)
@@ -303,6 +314,9 @@ class Window():
         self.camera.update(self.player)
         self.screen.fill((0, 0, 0))
         self.world.draw(self.camera)
+        for enemy in self.world.enemies:
+            enemy.update(self.player)
+            enemy.draw(self.camera)
         self.player.draw(self.camera)
         self.world.draw_foreground(self.camera)
         self.ui.draw(self.screen)

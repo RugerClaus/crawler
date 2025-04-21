@@ -21,7 +21,7 @@ class SaveManager:
                     {
                         "item_id": item_props["item_id"], 
                         "item_type": item_props["item_type"],
-                        "potion_type": item_props.get("potion_type", ""),
+                        "potion_type": item_props.get("potion_type"),
                         "heal_amount": item_props.get("heal_amount", 0),
                         "coin_type": item_props.get("coin_type", "")
                     }

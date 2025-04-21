@@ -1,6 +1,7 @@
 import pygame
 from core.app.world.tiles import Tile
 from core.app.world.level_structures.level_1_structure import *
+from core.app.entities.character.enemy import Enemy #for testing will handle this elsewhere once I'm sure the enemy class works.
 
 class World:
     def __init__(self, screen, grid_width, grid_height, tile_size, starting_level):
@@ -14,6 +15,7 @@ class World:
         self.buildings = []
         self.damaging_tiles = []
         self.gold_coin_animation = None
+        self.enemies = []
 
         self.load_assets()  # <-- New method
         self.load_terrain_tiles()
@@ -184,3 +186,9 @@ class World:
         tinted = surface.copy()
         tinted.fill(tint_color + (0,), special_flags=pygame.BLEND_RGBA_ADD)
         return tinted
+    
+    def generate_enemy(self):
+        enemy = Enemy(self.screen,self,grid_x=58,grid_y=58,tile_size=self.tile_size)
+        self.enemies.append(enemy)
+        if enemy in self.enemies:
+            print(f"Enemy added at: ({enemy.grid_x},{enemy.grid_y})")

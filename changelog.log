@@ -179,3 +179,37 @@ Alpha 0.1.71 ---- LOG
 - Added sound for picking up potion
 
 Minor refactoring changes including splitting entities into their own dirs.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.8 ---- LOG
+
+Now to begin prototyping enemies and their logic
+
+- Added enemy action sprites for a single enemy
+
+- Added the ability to spawn an "enemy" - really just an NPC rn
+
+- Added detection logic for the enemy to the player
+
+- Added rudimentary patrol logic
+
+- Added Enemy State file to track enemy state
+
+- Added Enemy class that handles all the enemy logic and animations, similar to the Player class
+
+- Fixed player potion pickup logic. 
+
+- Added callback for sound effects on use potion so I'm not handling it in the event loop
+
+- Added ui to use potion method so that I can have the potion count turn red and play a sound when the player is out of potions and health is less than max
+
+- Updated all sounds and equalized them so they aren't at extreme volumes or ear piercing and set the program volume back to 50%
+
+- Fixed the way potions are handled when picked up and ensured that my level structure function for loading potions skips the ones in the player.discarded_items list
+
+- Fixed saving logic pipeline from player.pick_up_item() to have the health potion store its potion type. No need to go in depth with irrellevant items like Coins
+
+No current way to save enemy position. Currently I'm trying to build this into an arena combat game
+
+The reason for this is that I want to perfect the enemy logic, pathfinding and combat before expanding the game into an RPG style crawler

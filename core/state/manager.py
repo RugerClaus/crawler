@@ -1,5 +1,6 @@
 from core.state.appstate import APPSTATE
-from core.state.gamestate import *
+from core.state.gamestate import GAMESTATE
+from core.state.playerstate import PLAYERSTATE
 
 class StateManager:
     def __init__(self, debug=True):
@@ -13,7 +14,7 @@ class StateManager:
         self.debug = debug
 
         self.game_state = GAMESTATE.PLAYER_INTERACTING  # Default game substate
-        self.player_state = PLAYERSTATE.HOLDING_STILL
+        self.player_state = PLAYERSTATE.IDLE
         self.enemy_states = {}  # could map enemy IDs to states
 
     def set_app_state(self, new_state):

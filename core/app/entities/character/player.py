@@ -5,7 +5,7 @@ from core.state.playerstate import PLAYERSTATE
 from core.app.entities.items.coin import Coin
 from core.app.entities.items.items import Item
 from core.app.entities.items.healthpotion import HealthPotion
-from core.sound.sound import SoundManager
+from core.app.entities.special_tiles.spike import Spike
 
 class Player(Entity):
     def __init__(self, screen, world,x=1984,y=1984,health_potion_count=0,money=0,collected_items=list(),discarded_items=list()):
@@ -52,7 +52,7 @@ class Player(Entity):
                 pygame.image.load("assets/graphics/game/player/player_walk_down_1.png").convert_alpha(),
                 pygame.image.load("assets/graphics/game/player/player_walk_down_2.png").convert_alpha()
             ],
-            "DEAD": [pygame.image.load("assets/graphics/game/player/player_dead.png")]
+            "DEAD": [pygame.image.load("assets/graphics/game/player/player_dead.png").convert_alpha()]
         }
 
     def set_animations(self):
@@ -150,7 +150,8 @@ class Player(Entity):
             item_props = {
                 "item_id" : item.entity_id,
                 "item_type": item.type,
-                "heal_amount": item.heal_amount
+                "heal_amount": item.heal_amount,
+                "potion_type": item.potion_type
             }
             if sound is not None:
                 sound("pickup_potion")
@@ -178,16 +179,27 @@ class Player(Entity):
         
     def check_for_damage_sources(self, entities, sound=None):
         for entity in entities:
-            if self.rect.colliderect(entity.rect):
-                # Skip collected items if applicable
-                if any(item["item_id"] == getattr(entity, "entity_id", None) for item in self.collected_items):
-                    continue
+            if isinstance(entity,Spike):
+                if self.rect.colliderect(entity.rect):
+                    
+                    entity.hurt_player(self, sound)
+            else:
+                pass
 
-                entity.hurt_player(self, sound)
-
-    def use_health_potion(self):
+    def use_health_potion(self, sound=None,ui=None):
         if self.current_health >= self.max_health:
             print("Can't heal past Max Health")
+            return
+
+        if self.health_potion_count == 0:
+            if ui is not None:
+                if ui.potion_warning_start_time is None:
+                    ui.potion_warning_start_time = pygame.time.get_ticks()  # Start the timer
+                    
+                ui.potion_text_color = (255, 0, 0)  # Set red
+                if sound is not None:
+                    sound("no_more_item")
+            print("No more potions")
             return
 
         for item_props in self.collected_items:
@@ -195,17 +207,17 @@ class Player(Entity):
                 # Heal and clamp to max health
                 self.current_health += item_props["heal_amount"]
                 self.current_health = min(self.current_health, self.max_health)
+
+                if sound is not None:
+                    sound("drink_potion")
+
                 # Update inventory and stats
                 self.health_potion_count -= 1
                 self.discarded_items.append(item_props)
                 self.collected_items.remove(item_props)
 
-                # Play sound / animation hook here
                 print("Used a health potion!")
                 return
-
-        # If no potion was found
-        print("No more health potions")
 
     def reset(self, world, x=1984, y=1984):
         self.world = world
