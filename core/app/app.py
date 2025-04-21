@@ -24,7 +24,7 @@ class Window():
         self.title = f"Crawler - Version: {self.version}"
         self.fps = 60
         pygame.init()
-        self.save_manager = SaveManager()
+        self.save_manager = SaveManager(slot=1)
         self.font = FontEngine("default").font
         self.screen = pygame.display.set_mode((self.width,self.height))
         self.clock = pygame.time.Clock()
@@ -83,22 +83,25 @@ class Window():
         print(f"Starting new game, collected items,discarded items = {self.player.collected_items} || {self.player.discarded_items}")
 
     
-    def save_game(self):
+    def save_game(self,slot):
         print("Saving game...")
         print(f"Entities before save: {len(self.world.entities)}")
         self.saving_message_start_time = pygame.time.get_ticks()
         self.toggle_saving_message()
-        self.save_manager.save(self.player, self.world)
+        self.save_manager = SaveManager(slot)
+        self.save_manager.save(self.player, self.world,self.version)
         print(f"Entities after save: {len(self.world.entities)}")
+        self.pause_menu.close_slot_selector()
         
-    def load_game(self):
+    def load_game(self,slot):
         self.sound.stop_sfx()
         self.state.set_app_state(APPSTATE.GAME_ACTIVE)
         self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING)
 
         # Load the save file to get player and world data
         print("Loading save data...")
-        self.save_manager.load(self.player, self.world)
+        self.save_manager = SaveManager(slot)
+        self.save_manager.load(self.player, self.world,self.version)
         
         print(f"Loaded save data: {self.save_manager.loaded_data}")
 
@@ -218,6 +221,7 @@ class Window():
                     self.sound.play_sfx("game_over")
                 elif self.pause_state:
                     self.state.set_game_state(GAMESTATE.PAUSED)
+                    self.draw_everything()
                     self.pause_menu.draw()
                     self.draw_saving_text()
                     pygame.display.flip()

@@ -1,7 +1,7 @@
 import pygame
 from core.app.font import FontEngine
 
-class Button():
+class Button:
     def __init__(self, text, x, y, width, height, text_unhovered_color, text_hovered_color, action=None):
         self.text = text
         self.x = x
@@ -31,6 +31,8 @@ class Button():
         screen.blit(self.text_surface, self.text_rect)
 
     def is_clicked(self, mouse_pos, mouse_click):
+        # Debugging: print to check if button is clicked
         if self.rect.collidepoint(mouse_pos) and mouse_click:
+            print(f"Button {self.text} clicked!")  # Debugging
             if self.action:
                 self.action()

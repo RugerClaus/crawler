@@ -1,14 +1,14 @@
 import json
 import os
 from core.app.entities.coin import Coin
-from core.app.entities.spike import Spike
 from core.app.entities.healthpotion import HealthPotion
 
 class SaveManager:
-    def __init__(self, filepath="saves/save.json"):
-        self.filepath = filepath
+    def __init__(self, slot):
+        self.slot = slot
+        self.filepath = f"saves/save_slot_{self.slot}.json"
 
-    def save(self, player, world):
+    def save(self, player, world, version):
         print(f"[SAVE] Entities before saving: {len(world.entities)}")
         data = {
             "player": {
@@ -30,7 +30,8 @@ class SaveManager:
                 "discarded_items": list(player.discarded_items)
             },
             "level": world.level,
-            "entities": []
+            "entities": [],
+            "version": version
         }
 
         # Save entities (Coins and Health Potions)
@@ -63,11 +64,9 @@ class SaveManager:
         print(f"[SAVE] Entities after saving: {len(world.entities)}")
 
     def save_exists(self):
-        """Check if the save file exists."""
         return os.path.exists(self.filepath)
 
-    def load(self, player, world):
-        """Load the game save if the file exists."""
+    def load(self, player, world, version):
         if not self.save_exists():
             print("[SAVE] No save file found.")
             return False  # Return None or handle appropriately
@@ -76,6 +75,12 @@ class SaveManager:
             data = json.load(f)
 
         self.loaded_data = data
+
+        # Check if the version in the save file matches the current game version
+        save_version = data.get("version")
+        if save_version != version:
+            print(f"Save version {save_version} is outdated. Migrating to version {version}...")
+            self.handle_version_migration(data, save_version, version)
 
         # Load the level data
         saved_level = data.get("level")
@@ -105,7 +110,7 @@ class SaveManager:
             for item_data in data["player"]["collected_items"]
         ]
 
-        player.discarded_items = set(data["player"]["discarded_items"])
+        player.discarded_items = data["player"]["discarded_items"]
 
         # Load entities
         world.entities = []
@@ -135,3 +140,31 @@ class SaveManager:
 
         print(f"[SAVE] Game loaded from {self.filepath}")
         return data
+
+    def handle_version_migration(self, save_data, old_version, new_version):
+        # Migration logic based on version differences
+        if old_version == "1.0" and new_version == "1.1":
+            self.migrate_v1_to_v2(save_data)
+        elif old_version == "1.1" and new_version == "1.2":
+            self.migrate_v2_to_v3(save_data)
+        # Add more migrations as needed
+        
+        # Update the save file with the new version
+        save_data["version"] = new_version
+        self.save_game(save_data)
+
+    def migrate_v1_to_v2(self, save_data):
+        # Example migration: Add a new player attribute in v1.1
+        if "player_health" in save_data["player"]:
+            save_data["player"]["health"] = save_data["player"]["player_health"]
+            del save_data["player"]["player_health"]
+
+    def migrate_v2_to_v3(self, save_data):
+        # Example migration: Add a new feature in v1.2
+        save_data["world_data"]["new_feature"] = "default_value"
+
+    def save_game(self, save_data):
+        # Save the data back to the file
+        with open(self.filepath, 'w') as f:
+            json.dump(save_data, f, indent=4)
+        print("[SAVE] Game updated to the latest version.")

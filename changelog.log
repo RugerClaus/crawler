@@ -153,3 +153,18 @@ Alpha 0.1.61 ---- LOG
 - Streamlined save system yet again.
 * I was getting a problem with the game removing items after the game was saved.
 I was reinstantiating the MainMenu in the save game function so that the load game button wouldn't be grayed out
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.7 ---- LOG
+
+- Finished overhauling the graphical save system. It saves up to three different game slots. That's plenty for now. 
+
+- Sleeked up save and load mechanics with a transparent overlay
+
+- Made it so saves from previous versions will migrate to current save formatting for futureproofing
+
+* Makes it so my later adjustments when I have a whole player loop and game loop that I won't have to worry about conflicting save versions
+
+This has been one of the most frustrating features to implement, but I have finally hacked it together and shouldn't have to touch the difficult side
+of this system for a long time.
