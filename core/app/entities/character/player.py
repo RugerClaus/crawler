@@ -59,7 +59,7 @@ class Player(Entity):
         for key, frames in self.images.items():
             self.set_animation(key, Animation(frames, 10))
 
-    def update(self):
+    def update(self, sound):
         self.update_movement()
 
         future_x = self.world_x + self.speed_x
@@ -76,7 +76,7 @@ class Player(Entity):
             ((future_x + half_w - 1) // self.world.tile_size, (self.world_y + half_h - 1) // self.world.tile_size),
         ]
 
-        if all(not self.world.is_blocked(tx, ty) for tx, ty in horizontal_tiles):
+        if all(not self.world.is_blocked(tx, ty, sound) for tx, ty in horizontal_tiles):
             self.world_x = future_x
 
         # Then: check vertical movement
@@ -87,7 +87,7 @@ class Player(Entity):
             ((self.world_x + half_w - 1) // self.world.tile_size, (future_y + half_h - 1) // self.world.tile_size),
         ]
 
-        if all(not self.world.is_blocked(tx, ty) for tx, ty in vertical_tiles):
+        if all(not self.world.is_blocked(tx, ty, sound) for tx, ty in vertical_tiles):
             self.world_y = future_y
 
         self.rect.centerx = self.world_x

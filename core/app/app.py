@@ -151,6 +151,7 @@ class Window():
         self.ui.player = self.player
         self.camera = Camera(self.width, self.height)  # Reset the camera
         self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING)  # Ensure the game is active
+        self.sound.play_music("game")
 
     def draw_saving_text(self):
         if self.show_saving_message:
@@ -291,7 +292,7 @@ class Window():
             self.player.current_health -= 1
 
     def update_world_logic(self):
-        self.player.update()
+        self.player.update(self.sound.play_sfx)
         
         for entity in self.world.entities:
             entity.update_animation()

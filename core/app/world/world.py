@@ -136,12 +136,14 @@ class World:
             
 
 
-    def is_blocked(self, x, y):
+    def is_blocked(self, x, y,sound=None):
         cell = self.tiles.get((x, y))
         if not cell:
             return False
         if cell["object"]:
-            print(f"Blocked by object at {x}, {y}")
+            
+            if sound is not None:
+                sound("no_more_item")
             return True
         if cell["ground"] is None:
             print(f"No ground at {x}, {y}")

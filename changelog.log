@@ -213,3 +213,14 @@ Now to begin prototyping enemies and their logic
 No current way to save enemy position. Currently I'm trying to build this into an arena combat game
 
 The reason for this is that I want to perfect the enemy logic, pathfinding and combat before expanding the game into an RPG style crawler
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.81 ---- LOG
+
+- Added noise when bumping into walls and no longer tracking blocked blocks in the world object
+
+- Fixed game over sound that was headphone destroying and equalized it.
+
+- Fixed reset game method in Window object so that game music is played upon starting the game again
+
