@@ -11,14 +11,15 @@ class SoundManager:
         self.sound_effects = {
             "jump": 'assets/audio/jump.mp3',
             "plasma_rifle": 'assets/audio/weird_space_gun.wav',
-            "non_mechanical_item" : 'assets/audio/non_mechanical_weapon_pickup.wav',
+            "pickup_potion" : 'assets/audio/pickup_potion.wav',
             "mechanical_item": "assets/audio/mechanical_weapon_pickup.wav",
             "magnum": "assets/audio/gunshot.mp3",
             "gold_coin": "assets/audio/coinsound1.wav",
             "silver_coin": "assets/audio/coinsound2.wav",
             "bronze_coin": "assets/audio/coinsound3.wav",
             "player_hurt": "assets/audio/player_hurt.wav",
-            "game_over": "assets/audio/game_over.wav"
+            "game_over": "assets/audio/game_over.wav",
+            "drink_potion": "assets/audio/drink_potion.wav"
         }
         self.volume = volume
         self.music_active = True

@@ -1,6 +1,6 @@
 import sys
 import pygame
-from core.app.entities.player import Player
+from core.app.entities.character.player import Player
 from core.app.world.world import World
 from core.app.world.camera import Camera
 from core.state.playerstate import PLAYERSTATE
@@ -216,6 +216,7 @@ class Window():
                 self.main_menu.draw()
             elif self.state.is_app_state(APPSTATE.GAME_ACTIVE):
                 if self.player.game_over_state:
+                    self.draw_everything()
                     self.game_over_menu.draw()
                     self.sound.stop_music()
                     self.sound.play_sfx("game_over")
@@ -224,7 +225,6 @@ class Window():
                     self.draw_everything()
                     self.pause_menu.draw()
                     self.draw_saving_text()
-                    pygame.display.flip()
                 else:
                     self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING)
                     self.handle_input()
@@ -246,6 +246,7 @@ class Window():
                     self.toggle_debug()
                 if event.key == pygame.K_1:
                     self.player.use_health_potion()
+                    self.sound.play_sfx("drink_potion")
 
             if self.state.is_app_state(APPSTATE.MAIN_MENU):
                 self.main_menu.handle_event(event)

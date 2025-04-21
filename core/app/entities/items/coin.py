@@ -1,4 +1,4 @@
-from core.app.entities.items import Item
+from core.app.entities.items.items import Item
 from core.app.entities.animate import Animation
 
 class Coin(Item):

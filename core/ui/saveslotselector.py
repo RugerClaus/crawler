@@ -32,7 +32,7 @@ class SlotSelector:
             if self.mode == 'save' and exists:
                 button_text = f"Slot {i}: \nOverwrite?"
             elif self.mode == 'load' and not exists:
-                button_text = f"Slot {i}: (Empty)"
+                button_text = f"Slot {i}: \n(Empty)"
 
             # Create a Button for this slot, passing a wrapper function for the callback
             button = Button(

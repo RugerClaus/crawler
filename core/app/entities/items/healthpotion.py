@@ -1,5 +1,4 @@
-import pygame
-from core.app.entities.items import Item
+from core.app.entities.items.items import Item
 
 class HealthPotion(Item):
     def __init__(self, screen, grid_x, grid_y, tile_size, potion_type="small", image=None, entity_id=None,item_type="health_potion"):

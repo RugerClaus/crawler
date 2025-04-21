@@ -1,7 +1,7 @@
 import json
 import os
-from core.app.entities.coin import Coin
-from core.app.entities.healthpotion import HealthPotion
+from core.app.entities.items.coin import Coin
+from core.app.entities.items.healthpotion import HealthPotion
 
 class SaveManager:
     def __init__(self, slot):

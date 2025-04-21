@@ -19,3 +19,12 @@ So that's fun. I'm finally pulling some mechanics together.
 Press F9 for debug
 
 Press F5 to damage the player by 1 HP
+
+/entities/
+    - animate.py
+    - coin.py
+    - entity.py
+    - healthpotion.py
+    - items.py
+    - player.py
+    - spike.py

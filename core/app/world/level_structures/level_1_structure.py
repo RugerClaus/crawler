@@ -1,7 +1,7 @@
 import pygame
-from core.app.entities.coin import Coin
-from core.app.entities.spike import Spike
-from core.app.entities.healthpotion import HealthPotion
+from core.app.entities.items.coin import Coin
+from core.app.entities.special_tiles.spike import Spike
+from core.app.entities.items.healthpotion import HealthPotion
 
 def draw_house_tiles(terrain_tiles):
     house_tiles = []

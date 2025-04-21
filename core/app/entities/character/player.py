@@ -2,9 +2,10 @@ import pygame
 from core.app.entities.entity import Entity
 from core.app.entities.animate import Animation
 from core.state.playerstate import PLAYERSTATE
-from core.app.entities.coin import Coin
-from core.app.entities.items import Item
-from core.app.entities.healthpotion import HealthPotion
+from core.app.entities.items.coin import Coin
+from core.app.entities.items.items import Item
+from core.app.entities.items.healthpotion import HealthPotion
+from core.sound.sound import SoundManager
 
 class Player(Entity):
     def __init__(self, screen, world,x=1984,y=1984,health_potion_count=0,money=0,collected_items=list(),discarded_items=list()):
@@ -152,7 +153,7 @@ class Player(Entity):
                 "heal_amount": item.heal_amount
             }
             if sound is not None:
-                sound("pick_up")
+                sound("pickup_potion")
             self.collected_items.append(item_props)
             self.world.entities.remove(item)
         elif isinstance(item,Coin):
@@ -194,7 +195,6 @@ class Player(Entity):
                 # Heal and clamp to max health
                 self.current_health += item_props["heal_amount"]
                 self.current_health = min(self.current_health, self.max_health)
-
                 # Update inventory and stats
                 self.health_potion_count -= 1
                 self.discarded_items.append(item_props)

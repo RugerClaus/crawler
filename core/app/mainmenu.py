@@ -10,7 +10,7 @@ class MainMenu:
         self.screen = window.screen
         self.load_callback = load_callback
         self.slot_selector = None
-
+ 
         # Background animation setup
         bg_frames = [
             pygame.image.load(f"assets/graphics/menu/menu_bg/frame_{i}.png").convert_alpha()

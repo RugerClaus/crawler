@@ -168,3 +168,14 @@ Alpha 0.1.7 ---- LOG
 
 This has been one of the most frustrating features to implement, but I have finally hacked it together and shouldn't have to touch the difficult side
 of this system for a long time.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.71 ---- LOG
+
+- Added the load game overlay to the gameover screen. It was a lot faster this time since I knew what I was doing
+
+- Added sound for picking up potion
+
+Minor refactoring changes including splitting entities into their own dirs.
