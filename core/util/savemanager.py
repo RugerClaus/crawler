@@ -2,6 +2,7 @@ import json
 import os
 from core.app.entities.items.coin import Coin
 from core.app.entities.items.healthpotion import HealthPotion
+from core.app.entities.character.enemy import Enemy
 
 class SaveManager:
     def __init__(self, slot):
@@ -31,6 +32,7 @@ class SaveManager:
             },
             "level": world.level,
             "entities": [],
+            "enemies": [],
             "version": version
         }
 
@@ -56,6 +58,14 @@ class SaveManager:
                         'potion_type': entity.potion_type,
                         'entity_id': entity.entity_id
                     })
+
+        for enemy in world.enemies:
+            if isinstance(enemy, Enemy):
+                data["enemies"].append({
+                    "id": enemy.id,
+                    "grid_x": enemy.grid_x,
+                    "grid_y": enemy.grid_y
+                })
 
         # Save the data to a JSON file
         with open(self.filepath, "w") as f:
@@ -138,33 +148,40 @@ class SaveManager:
                 health_potion.rect.y = y
                 world.entities.append(health_potion)
 
+        world.enemies = []
+        for enemy_data in data["enemies"]:
+            enemy_id = enemy_data["id"]
+            grid_x,grid_y = enemy_data["grid_x"],enemy_data["grid_y"]
+
+            enemy = Enemy(world.screen,world,grid_x,grid_y,world.tile_size,enemy_id)
+            print(f"Loaded enemy with ID {enemy.id} at position ({grid_x}, {grid_y})")
+            world.enemies.append(enemy)
+
         print(f"[SAVE] Game loaded from {self.filepath}")
         return data
 
     def handle_version_migration(self, save_data, old_version, new_version):
-        # Migration logic based on version differences
+
         if old_version == "1.0" and new_version == "1.1":
             self.migrate_v1_to_v2(save_data)
         elif old_version == "1.1" and new_version == "1.2":
             self.migrate_v2_to_v3(save_data)
-        # Add more migrations as needed
-        
-        # Update the save file with the new version
+
         save_data["version"] = new_version
         self.save_game(save_data)
 
     def migrate_v1_to_v2(self, save_data):
-        # Example migration: Add a new player attribute in v1.1
+
         if "player_health" in save_data["player"]:
             save_data["player"]["health"] = save_data["player"]["player_health"]
             del save_data["player"]["player_health"]
 
     def migrate_v2_to_v3(self, save_data):
-        # Example migration: Add a new feature in v1.2
+
         save_data["world_data"]["new_feature"] = "default_value"
 
     def save_game(self, save_data):
-        # Save the data back to the file
+
         with open(self.filepath, 'w') as f:
             json.dump(save_data, f, indent=4)
         print("[SAVE] Game updated to the latest version.")

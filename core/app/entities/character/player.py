@@ -97,9 +97,9 @@ class Player(Entity):
 
         if self.current_health <= 0:
             self.state = PLAYERSTATE.DEAD
-            self.health = 0
+            self.current_health = 0
             self.game_over_state = True
-
+            
         self.select_animation()
         self.update_animation()
 

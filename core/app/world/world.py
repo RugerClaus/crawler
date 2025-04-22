@@ -16,6 +16,7 @@ class World:
         self.damaging_tiles = []
         self.gold_coin_animation = None
         self.enemies = []
+        self.enemy_id_counter = 0
 
         self.load_assets()  # <-- New method
         self.load_terrain_tiles()
@@ -151,8 +152,6 @@ class World:
     def update(self):
         for entity in self.entities:
             entity.update()
-        for enemy in self.enemies:
-            enemy.update()
 
     def draw(self, camera, debug=False):
        
@@ -190,10 +189,12 @@ class World:
         return tinted
     
     def generate_enemy(self):
+        self.enemy_id_counter += 1
         enemy = Enemy(self.screen,self,grid_x=58,grid_y=58,tile_size=self.tile_size)
+        enemy.id = self.enemy_id_counter
         self.enemies.append(enemy)
         if enemy in self.enemies:
-            print(f"Enemy added at: ({enemy.grid_x},{enemy.grid_y})")
+            print(f"Enemy added at: ({enemy.grid_x},{enemy.grid_y}) with ID: {enemy.id}")
 
     def has_line_of_sight(self, start_x, start_y, end_x, end_y):
         x0, y0 = int(start_x), int(start_y)

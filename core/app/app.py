@@ -33,7 +33,7 @@ class Window():
         self.world = World(self.screen, 124,124, 32,1)
         self.player = Player(self.screen, self.world)
         self.world.generate_map(self.player)
-        self.camera = Camera(self.width, self.height)  # Add this
+        self.camera = Camera(self.width, self.height)
         self.sound = SoundManager()
         self.pause_menu = PauseMenu(
             self,
@@ -71,7 +71,7 @@ class Window():
         if self.world is None:
             self.world = World(self.screen, 124, 124, 32, 1)
         else:
-            self.world.reset()  # you'd have to write this to clear entities / reset world state
+            self.world.reset()
 
         if self.player is None:
             self.player = Player(self.screen, self.world)
@@ -99,42 +99,35 @@ class Window():
         self.state.set_app_state(APPSTATE.GAME_ACTIVE)
         self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING)
 
-        # Load the save file to get player and world data
         print("Loading save data...")
         self.save_manager = SaveManager(slot)
         self.save_manager.load(self.player, self.world,self.version)
         
         print(f"Loaded save data: {self.save_manager.loaded_data}")
 
-        # Create the world based on the saved level
         self.world = World(self.screen, 124, 124, 32, 1)
         
-        # Get the level from the loaded data
         saved_level = self.save_manager.loaded_data["level"]
         print(f"Loaded level: {saved_level}")
         
         self.world.level = saved_level
         
-
-        # Create the player object with the required arguments, passing loaded coordinates
         print("Creating player object...")
         player_data = self.save_manager.loaded_data["player"]
         self.player = Player(self.screen, self.world, player_data["x"], player_data["y"],
                              player_data["potion_count"],player_data["money"],collected_items=player_data["collected_items"],
-                             discarded_items=player_data["discarded_items"])  # Pass loaded position
+                             discarded_items=player_data["discarded_items"])
         self.world.generate_map(self.player)
         
-
-        # Set the player's health from the save data
         print(f"Setting player position and health: {player_data}")
         self.player.current_health = player_data["health"]
 
-        # Sync UI and camera with the new player and world
         print("Syncing UI and camera with player and world...")
         self.ui.player = self.player
         self.camera = Camera(self.width, self.height)
 
-        # Stop menu music and start game music
+        print(f"Enemies in save: {self.save_manager.loaded_data.get('enemies', [])}")
+
         print("Changing music...")
         self.sound.stop_music()
         self.sound.play_music("game")
@@ -143,14 +136,14 @@ class Window():
 
     def reset_game(self):
         self.sound.stop_sfx()
-        self.world = World(self.screen, 124, 124, 32, 1)  # Create a new world instance
+        self.world = World(self.screen, 124, 124, 32, 1) 
         self.world.generate_map(self.player)
-        self.player = Player(self.screen, self.world)  # Reset the player
+        self.player = Player(self.screen, self.world) 
         self.player.game_over_state = False
         self.player.current_health = self.player.max_health
         self.ui.player = self.player
-        self.camera = Camera(self.width, self.height)  # Reset the camera
-        self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING)  # Ensure the game is active
+        self.camera = Camera(self.width, self.height) 
+        self.state.set_game_state(GAMESTATE.PLAYER_INTERACTING) 
         self.sound.play_music("game")
 
     def draw_saving_text(self):
@@ -158,24 +151,22 @@ class Window():
             now = pygame.time.get_ticks()
             elapsed = now - self.saving_message_start_time
 
-            fade_duration = 500  # fade out over 500 ms
-            visible_duration = 1000  # fully visible for 1 second
+            fade_duration = 500 
+            visible_duration = 1000 
 
             if elapsed < visible_duration:
-                alpha = 255  # full opacity
+                alpha = 255 
             elif elapsed < visible_duration + fade_duration:
-                # calculate fade-out alpha
+                
                 fade_progress = (elapsed - visible_duration) / fade_duration
                 alpha = int(255 * (1 - fade_progress))
             else:
                 self.show_saving_message = False
-                return  # don’t draw anything after fading is done
+                return 
 
-            # Render text with alpha support
             text_surface = self.font.render("Saving Game...", True, (255, 255, 255))
             text_surface.set_alpha(alpha)
 
-            # You must convert the surface to allow alpha per-blit (if not already):
             text_surface = text_surface.convert_alpha()
 
             self.screen.blit(text_surface, (50, 750))
@@ -208,7 +199,7 @@ class Window():
 
     def main_loop(self):
         self.state.set_app_state(APPSTATE.MAIN_MENU)
-        self.sound.play_music("menu")  # Assuming you have a menu theme
+        self.sound.play_music("menu")
 
         while True:
             self.handle_events()
@@ -251,11 +242,11 @@ class Window():
                 if event.key == pygame.K_g:
                     for enemy in self.world.enemies:
                         enemy.intent = ENEMYSTATE.PATROLLING
-                        print(f"Setting enemy intent to PATROLLING: {enemy.intent}")  # Debug statement to confirm update
+                        print(f"Setting enemy intent to PATROLLING: {enemy.intent}")
                 if event.key == pygame.K_h:
                     for enemy in self.world.enemies:
                         enemy.intent = ENEMYSTATE.IDLE
-                        print(f"Setting enemy intent to IDLE: {enemy.intent}")  # Debug statement to confirm update
+                        print(f"Setting enemy intent to IDLE: {enemy.intent}")
                 if event.key == pygame.K_1:
                     self.player.use_health_potion(self.sound.play_sfx,self.ui)        
 
@@ -263,7 +254,7 @@ class Window():
                 self.main_menu.handle_event(event)
 
             elif self.player.game_over_state:
-                self.game_over_menu.handle_event(event)  # <-- Add this!
+                self.game_over_menu.handle_event(event)
 
             elif self.state.is_game_state(GAMESTATE.PAUSED):
                 self.pause_menu.handle_event(event)
@@ -298,15 +289,21 @@ class Window():
             entity.update_animation()
         for tile in self.world.damaging_tiles:
             tile.hurt_player(self.player)
+        if not self.pause_state:
+            for enemy in self.world.enemies:
+                enemy.update(self.player,self.sound)
+                enemy.check_health(self.sound.play_sfx)
 
 
     def handle_collisions(self):
         self.player.check_for_items(self.sound.play_sfx)
         self.player.check_for_damage_sources(self.world.entities,self.sound.play_sfx)
         self.player.check_for_enemies(self.world.enemies,self.sound.play_sfx)
+        for enemy in self.world.enemies:
+            enemy.check_for_damage_sources(self.world.entities,self.sound.play_sfx)
 
     def cleanup_entities(self):
-        # Placeholder for when you want to remove dead or collected entities.
+        
         pass
 
     def toggle_debug(self):
@@ -318,7 +315,6 @@ class Window():
         self.world.draw(self.camera)
         self.player.draw(self.camera)
         for enemy in self.world.enemies:
-            enemy.update(self.player)
             enemy.draw(self.camera)
         
         self.world.draw_foreground(self.camera)

@@ -20,7 +20,9 @@ class SoundManager:
             "player_hurt": "assets/audio/player_hurt.wav",
             "game_over": "assets/audio/game_over.wav",
             "drink_potion": "assets/audio/drink_potion.wav",
-            "no_more_item": "assets/audio/no_more_item.wav"
+            "no_more_item": "assets/audio/no_more_item.wav",
+            "enemy_hurt": "assets/audio/enemy_hurt.wav",
+            "enemy_death": "assets/audio/enemy_death.wav"
         }
         self.volume = volume
         self.music_active = True
@@ -50,14 +52,14 @@ class SoundManager:
             if state in self.music_tracks:
                 pygame.mixer.music.load(self.music_tracks[state])
                 pygame.mixer.music.set_volume(self.volume)
-                pygame.mixer.music.play(-1)  # Loop indefinitely
+                pygame.mixer.music.play(-1)
                 self.current_track = state
                 print(f"Music on: {state}")
 
         self.music_active = not self.music_active
 
     def set_volume(self, volume):
-        self.volume = max(0, min(volume, 1))  # Ensure volume is between 0 and 1
+        self.volume = max(0, min(volume, 1))
         pygame.mixer.music.set_volume(self.volume)
 
     def play_sfx(self, sfx_name):

@@ -1,12 +1,13 @@
 import pygame
 from core.app.entities.entity import Entity
 from core.state.enemystate import ENEMYSTATE
+from core.app.entities.special_tiles.spike import Spike
 import math
 
 class Enemy(Entity):
-    def __init__(self, screen, world, grid_x, grid_y, tile_size):
+    def __init__(self, screen, world, grid_x, grid_y, tile_size,id=None):
         super().__init__(screen, False, 0)
-
+        self.id = None
         self.tile_size = tile_size
         self.grid_x = grid_x
         self.grid_y = grid_y
@@ -20,11 +21,12 @@ class Enemy(Entity):
         self.speed_x = 2
         self.speed_y = 2
         self.walking_speed = 0
-        self.health = 100
+        self.health = 50
         self.damage = 15
+        self.last_hurt_time = 0
 
         self.original_world_x = self.world_x
-        self.patrol_range = 5 * tile_size
+        self.patrol_range = 20 * tile_size
         self.direction = 1  # 1 means moving right, -1 means moving left
 
         self.animations = {
@@ -34,6 +36,12 @@ class Enemy(Entity):
                                     pygame.image.load("assets/graphics/game/enemies/idle_2.png").convert_alpha()],
             ENEMYSTATE.DETECTED: [pygame.image.load("assets/graphics/game/enemies/idle_1.png").convert_alpha(),
                                     pygame.image.load("assets/graphics/game/enemies/idle_2.png").convert_alpha()],
+            ENEMYSTATE.DEAD:    [pygame.image.load("assets/graphics/game/enemies/dead.png")] 
+            
+            #for future use
+            #[pygame.image.load("assets/graphics/game/enemies/dead_1.png"),
+             #                 pygame.image.load("assets/graphics/game/enemies/dead_2.png"),
+              #                pygame.image.load("assets/graphics/game/enemies/dead_3.png")]
         }
 
 
@@ -51,12 +59,18 @@ class Enemy(Entity):
         ]
         self.detected_bubble_frame_index = 0
         self.detected_bubble_animation_timer = 0
-        self.detected_bubble_animation_delay = 10  # frames before switching to the next frame
+        self.detected_bubble_animation_delay = 10
 
         self.detection_radius = 10 * tile_size
         self.detection_timer = 0
-        self.detection_delay_threshold = 30  # 1 second if your game runs at 60 FPS
+        self.detection_delay_threshold = 30
+        self.death_start_time = None
+        self.death_delay_threshold = 2000
         self.previous_state = self.state
+        print(f"Enemy created: ID={self.id}, Position=({self.grid_x}, {self.grid_y})")
+        self.being_hurt = False
+
+
 
 
     def draw(self, camera):
@@ -71,13 +85,8 @@ class Enemy(Entity):
             bubble_y = pixel_y - bubble_frame.get_height() - 5
             self.screen.blit(bubble_frame, (bubble_x, bubble_y))
 
-    def update(self, player):
+    def update(self, player,sound_engine=None):
         self.previous_state = self.state
-
-        if self.health <= 0:
-            self.state = ENEMYSTATE.DEAD
-            self.animation = self.animations.get(ENEMYSTATE.DEAD, self.animation)
-            return
 
         self.target = player
 
@@ -133,16 +142,29 @@ class Enemy(Entity):
         distance = math.hypot(dx, dy)
 
         if distance != 0:
-            self.world_x += (dx / distance) * self.speed_x
-            self.world_y += (dy / distance) * self.speed_y
+
+            new_x = self.world_x + (dx / distance) * self.speed_x
+            new_y = self.world_y + (dy / distance) * self.speed_y
+
+            new_grid_x = int(new_x // self.tile_size)
+            new_grid_y = int(new_y // self.tile_size)
+
+            if not self.world.is_blocked(new_grid_x, new_grid_y):
+                self.world_x = new_x
+                self.world_y = new_y
 
     def patrol(self):
-        self.world_x += self.speed_x * self.direction
 
-        if self.world_x > self.original_world_x + self.patrol_range:
-            self.direction = -1  # reverse left
-        elif self.world_x < self.original_world_x - self.patrol_range:
-            self.direction = 1  # reverse right
+        new_x = self.world_x + self.speed_x * self.direction
+
+        new_grid_x = int(new_x // self.tile_size)
+        new_grid_y = int(self.world_y // self.tile_size)
+
+        if not self.world.is_blocked(new_grid_x, new_grid_y):
+            self.world_x = new_x
+        else:
+
+            self.direction = -self.direction
 
     def update_animation(self):
         if self.state in self.animations:
@@ -156,7 +178,7 @@ class Enemy(Entity):
             self.image = current_animation[self.animation_frame_index]
 
         if self.state == ENEMYSTATE.DETECTED:
-            # Only advance the animation if it hasn't finished
+
             if self.detected_bubble_frame_index < len(self.detected_bubble_frames) - 1:
                 self.detected_bubble_animation_timer += 1
                 if self.detected_bubble_animation_timer >= self.detected_bubble_animation_delay:
@@ -168,9 +190,45 @@ class Enemy(Entity):
 
     def attack(self,player,sound):
         now = pygame.time.get_ticks()
-        if not hasattr(player, 'last_damage_time') or now - player.last_damage_time > 1000:  # 1 sec i-frame
+        if not hasattr(player, 'last_damage_time') or now - player.last_damage_time > 1000:
             player.current_health -= self.damage
             player.last_damage_time = now
             print("Ouch!")
             if sound is not None:
                 sound("player_hurt")
+
+                
+    def check_for_damage_sources(self, entities, sound=None):
+        
+        if self.state == ENEMYSTATE.DEAD:
+            soundfx = "enemy_death"  
+        else:
+            soundfx = "enemy_hurt"
+            now = pygame.time.get_ticks()
+            for entity in entities:
+                if isinstance(entity, Spike):
+                    if self.rect.colliderect(entity.rect):
+                        if now - self.last_hurt_time > 1000:
+                            entity.hurt_other_entity(self)
+                            self.last_hurt_time = now
+                            if sound is not None:
+                                print("playing enemy hurt sound")
+                                sound(soundfx)
+    
+    # check_health, the following method will be used to alter enemy behavior at different health levels
+    #i.e. health below 50%: go agro()
+
+    def check_health(self, sound=None):
+        if self.health <= 0 and self.state != ENEMYSTATE.DEAD:
+            self.state = ENEMYSTATE.DEAD
+            self.death_start_time = pygame.time.get_ticks()
+            self.animation = self.animations.get(ENEMYSTATE.DEAD, self.animation)
+            self.animation_frame_index = 0
+            self.animation_timer = 0
+            self.image = self.animation[self.animation_frame_index]
+            if sound is not None and not hasattr(self, 'has_played_death_sound'):
+                print("Playing enemy death sound")
+                sound("enemy_death")
+                self.has_played_death_sound = True 
+            self.world.enemies.remove(self)
+            print("Killed enemy")

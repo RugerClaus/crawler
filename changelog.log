@@ -244,3 +244,24 @@ Alpha 0.1.82 ---- LOG
 - Added Enemy count to debugger
 
 Overall it's shaping up, and we're getting somewhere
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.9 ---- LOG
+
+- Added logic for player pursuing and detection of tiles in the object layer (walls and other obstacles)
+
+- Worked through some saving logic for enemies, but it doesn't really work yet. Gonna leave the code there for later.
+
+- Enemies now can take damage from environmental hazards such as spikes (the only environmental hazard so far)
+
+- Added sounds: enemy_hurt, enemy_death
+
+- Enemy can damage the player and kill it
+
+There is now technically a combat loop in which the player can run from enemies and force them to cross the spike tile
+
+Technically you could call this a game because the player exists, and has enemies that give chase, and the player can kill them or 
+be killed. As well as having money for some reason, but i'll use that for merchants and shit. You can buy the super ultra killatron 5000 weapon
+
+Overall a pretty large update due to the complexity of those features

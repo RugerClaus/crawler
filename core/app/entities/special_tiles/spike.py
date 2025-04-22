@@ -19,12 +19,19 @@ class Spike(Entity):
 
     def hurt_player(self, player,sound=None):
         now = pygame.time.get_ticks()
-        if not hasattr(player, 'last_damage_time') or now - player.last_damage_time > 1000:  # 1 sec i-frame
+        if not hasattr(player, 'last_damage_time') or now - player.last_damage_time > 1000:
             player.current_health -= self.damage
             player.last_damage_time = now
             print("Ouch!")
             if sound is not None:
                 sound("player_hurt")
+
+    def hurt_other_entity(self,entity):
+        now = pygame.time.get_ticks()
+        if not hasattr(entity,'last_damage_time') or now - entity.last_damage_time > 2000:
+            entity.health -= self.damage
+            entity.last_damage_time = now
+            print(f"Enemy remaining health: {entity.health}")
 
     def draw(self, camera):
         super().draw(camera)
