@@ -6,6 +6,7 @@ from core.app.entities.items.coin import Coin
 from core.app.entities.items.items import Item
 from core.app.entities.items.healthpotion import HealthPotion
 from core.app.entities.special_tiles.spike import Spike
+from core.app.entities.character.enemy import Enemy
 
 class Player(Entity):
     def __init__(self, screen, world,x=1984,y=1984,health_potion_count=0,money=0,collected_items=list(),discarded_items=list()):
@@ -186,6 +187,15 @@ class Player(Entity):
             else:
                 pass
 
+    def check_for_enemies(self,enemies,sound=None):
+        for enemy in enemies:
+            if isinstance(enemy,Enemy):
+                if self.rect.colliderect(enemy.rect):
+                    print("collided")
+                    enemy.attack(self, sound)
+            else:
+                pass
+
     def use_health_potion(self, sound=None,ui=None):
         if self.current_health >= self.max_health:
             print("Can't heal past Max Health")
@@ -194,9 +204,9 @@ class Player(Entity):
         if self.health_potion_count == 0:
             if ui is not None:
                 if ui.potion_warning_start_time is None:
-                    ui.potion_warning_start_time = pygame.time.get_ticks()  # Start the timer
+                    ui.potion_warning_start_time = pygame.time.get_ticks()
                     
-                ui.potion_text_color = (255, 0, 0)  # Set red
+                ui.potion_text_color = (255, 0, 0)
                 if sound is not None:
                     sound("no_more_item")
             print("No more potions")
@@ -204,14 +214,12 @@ class Player(Entity):
 
         for item_props in self.collected_items:
             if item_props["item_type"] == "health_potion":
-                # Heal and clamp to max health
                 self.current_health += item_props["heal_amount"]
                 self.current_health = min(self.current_health, self.max_health)
 
                 if sound is not None:
                     sound("drink_potion")
 
-                # Update inventory and stats
                 self.health_potion_count -= 1
                 self.discarded_items.append(item_props)
                 self.collected_items.remove(item_props)

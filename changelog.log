@@ -224,3 +224,23 @@ Alpha 0.1.81 ---- LOG
 
 - Fixed reset game method in Window object so that game music is played upon starting the game again
 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Alpha 0.1.82 ---- LOG
+
+- Added very basic enemy pathfinding logic.
+
+- Enemies can't detect player behind walls
+
+- Enemies now patrol on the x axis
+
+- Fixed detection logic and set enemy radius to 10 tiles
+
+- Added basic collision logic for enemies and players
+
+- Enlarged Debugger more so that I can track more values
+
+- Added Enemy count to debugger
+
+Overall it's shaping up, and we're getting somewhere

@@ -18,7 +18,6 @@ class Spike(Entity):
         )
 
     def hurt_player(self, player,sound=None):
-        # Simple damage with cooldown prevention, assuming player has this logic.
         now = pygame.time.get_ticks()
         if not hasattr(player, 'last_damage_time') or now - player.last_damage_time > 1000:  # 1 sec i-frame
             player.current_health -= self.damage

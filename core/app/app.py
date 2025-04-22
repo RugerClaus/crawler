@@ -303,6 +303,7 @@ class Window():
     def handle_collisions(self):
         self.player.check_for_items(self.sound.play_sfx)
         self.player.check_for_damage_sources(self.world.entities,self.sound.play_sfx)
+        self.player.check_for_enemies(self.world.enemies,self.sound.play_sfx)
 
     def cleanup_entities(self):
         # Placeholder for when you want to remove dead or collected entities.
@@ -315,10 +316,11 @@ class Window():
         self.camera.update(self.player)
         self.screen.fill((0, 0, 0))
         self.world.draw(self.camera)
+        self.player.draw(self.camera)
         for enemy in self.world.enemies:
             enemy.update(self.player)
             enemy.draw(self.camera)
-        self.player.draw(self.camera)
+        
         self.world.draw_foreground(self.camera)
         self.ui.draw(self.screen)
         if self.debug_enabled == True:

@@ -37,13 +37,12 @@ class World:
 
     def reset(self, starting_level=1):
         self.level = starting_level
-        self.tiles.clear()              # Clear static map
-        self.entities.clear()           # Clear dynamic entities
-        self.buildings.clear()          # Clear any placed buildings
-        self.damaging_tiles.clear()     # Clear spikes or traps
-        self.gold_coin_animation = None # Reset animations
+        self.tiles.clear()
+        self.entities.clear()
+        self.buildings.clear()
+        self.damaging_tiles.clear()
+        self.gold_coin_animation = None
 
-        # Optionally reset positions for coins and potions
         self.coin_positions = {
             "coin_0": (52, 52, "gold"),
             "coin_1": (55, 52, "silver"),
@@ -58,7 +57,6 @@ class World:
         }
 
     def load_assets(self):
-        # Only load images once, store frames, not Animation instances
         self.coin_frames = {
             "gold": [
                 pygame.image.load(f"assets/graphics/game/currency/gold_coin_{i}.png").convert_alpha()
@@ -143,7 +141,7 @@ class World:
         if cell["object"]:
             
             if sound is not None:
-                sound("no_more_item")
+                sound("bump_wall")
             return True
         if cell["ground"] is None:
             print(f"No ground at {x}, {y}")
@@ -153,6 +151,8 @@ class World:
     def update(self):
         for entity in self.entities:
             entity.update()
+        for enemy in self.enemies:
+            enemy.update()
 
     def draw(self, camera, debug=False):
        
@@ -194,3 +194,32 @@ class World:
         self.enemies.append(enemy)
         if enemy in self.enemies:
             print(f"Enemy added at: ({enemy.grid_x},{enemy.grid_y})")
+
+    def has_line_of_sight(self, start_x, start_y, end_x, end_y):
+        x0, y0 = int(start_x), int(start_y)
+        x1, y1 = int(end_x), int(end_y)
+
+        dx = abs(x1 - x0)
+        dy = abs(y1 - y0)
+
+        x, y = x0, y0
+        n = 1 + dx + dy
+        x_inc = 1 if x1 > x0 else -1
+        y_inc = 1 if y1 > y0 else -1
+        error = dx - dy
+
+        dx *= 2
+        dy *= 2
+
+        for _ in range(n):
+            if self.is_blocked(x, y):
+                return False  # Wall in the way
+
+            if error > 0:
+                x += x_inc
+                error -= dy
+            else:
+                y += y_inc
+                error += dx
+
+        return True  # No walls blocking
